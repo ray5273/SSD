@@ -3,6 +3,8 @@
 /.idea/workspace.xml
 /.idea/
 /venv/
+.idea
+.venv
 __pycache__
 
 *ssd*.txt
