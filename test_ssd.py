@@ -80,3 +80,11 @@ def test_write_data(clean_ssd):
     """
     check_write_and_read(clean_ssd, "0", "0x1234ABCD")
     check_write_and_read(clean_ssd, f"{LBA_LENGTH - 1}", "0xAAAA5555")
+
+@pytest.mark.skip
+def test_repeat_write_to_same_address(clean_ssd):
+    """
+    같은 주소에 write 반복
+    """
+    for wdata in ["0xABCD1234", "0xFFFFFFFF", "0xAAAAAAAA"]:
+        check_write_and_read(clean_ssd, "10", wdata)
