@@ -88,3 +88,19 @@ def test_repeat_write_to_same_address(clean_ssd):
     """
     for wdata in ["0xABCD1234", "0xFFFFFFFF", "0xAAAAAAAA"]:
         check_write_and_read(clean_ssd, "10", wdata)
+
+@pytest.mark.skip
+def test_write_multiple_address(clean_ssd):
+    addr_data_pairs = [
+        ("10", "0xAAAA5555"),
+        ("20", "0xBBBB4444")
+    ]
+
+    # Write to multiple addresses
+    for addr, data in addr_data_pairs:
+        clean_ssd.run([WRITE_COMMAND, addr, data])
+
+    # Read and verify each address
+    for addr, expected_data in addr_data_pairs:
+        clean_ssd.run([READ_COMMAND, addr])
+        assert_output_file(expected_data)
