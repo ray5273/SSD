@@ -1,3 +1,4 @@
+import os
 import sys
 from abc import ABC, abstractmethod
 
@@ -24,20 +25,26 @@ class WriteCommand(ICommand):
 
 
 class SSD:
-    ssd_file_name = "ssd_nand.txt"
-    output_file_name = "ssd_output.txt"
+    NAND_FILE = "ssd_nand.txt"
+    OUTPUT_FILE = "ssd_output.txt"
     LBA_LENGTH = 100
 
     def __init__(self):
-        self.ssd_file = self.init_ssd_nand_file()
-        self.output_file = self.init_sdd_output_file()
+        self.init_ssd_nand_file()
+        self.init_sdd_output_file()
 
     def init_ssd_nand_file(self):
-        ...
+        if not os.path.exists(self.NAND_FILE):
+            with open(self.NAND_FILE, "w") as f:
+                f.write("")
+            for lba in range(self.LBA_LENGTH):
+                # WriteCommand(self.NAND_FILE, self.output_file, lba, 0x00000000).execute()
+                pass
 
     def init_sdd_output_file(self):
-        ...
-
+        if not os.path.exists(self.OUTPUT_FILE):
+            with open(self.OUTPUT_FILE, "w") as f:
+                f.write("")
 
     def run(self, argv):
         if argv[0] == "R":
