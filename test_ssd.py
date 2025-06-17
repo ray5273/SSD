@@ -9,8 +9,7 @@ OUTPUT_FILE = "test_ssd_output.txt"
 EMPTY_DATA = "0x00000000"
 WRITE_COMMAND = "W"
 READ_COMMAND = "R"
-
-
+ERROR_MESSAGE = "ERROR"
 
 
 def remove_files():
@@ -104,3 +103,15 @@ def test_write_multiple_address(clean_ssd):
     for addr, expected_data in addr_data_pairs:
         clean_ssd.run([READ_COMMAND, addr])
         assert_output_file(expected_data)
+
+
+@pytest.mark.skip
+def test_out_of_lba_range_read(clean_ssd):
+    clean_ssd.run([READ_COMMAND, "99999999"])
+    assert_output_file(ERROR_MESSAGE)
+
+@pytest.mark.skip
+def test_out_of_lba_range_write(clean_ssd):
+    clean_ssd.run([WRITE_COMMAND, "12345678", "0x000000000"])
+    assert_output_file(ERROR_MESSAGE)
+
