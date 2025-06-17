@@ -9,7 +9,7 @@ def cli():
 @click.argument('lba')
 @click.argument('data')
 def write(lba, data):
-    """wirte"""
+    """write"""
     pass
 
 @cli.command(name="read")
