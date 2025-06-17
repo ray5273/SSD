@@ -1,7 +1,7 @@
 import os.path
 import pytest
 
-from SSD import SSD
+from ssd import SSD
 
 LBA_LENGTH = 100
 NAND_FILE = "test_ssd_nand.txt"
