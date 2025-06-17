@@ -41,3 +41,11 @@ def test_initial_nand_file(clean_ssd):
         last_line = lines[-1].strip()
         assert first_line == f"0 {EMPTY_DATA}"
         assert last_line == f"{LBA_LENGTH-1} {EMPTY_DATA}"
+
+def test_initial_output_file(clean_ssd):
+    """
+    output 파일 초기화가 잘 되었는지
+    """
+    with open(OUTPUT_FILE, 'r') as f:
+        content = f.read()
+        assert content == ""
