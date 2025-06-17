@@ -41,7 +41,7 @@ class SSD:
                 # WriteCommand(self.NAND_FILE, self.output_file, lba, 0x00000000).execute()
                 pass
 
-    def init_sdd_output_file(self):
+    def init_ssd_output_file(self):
         if not os.path.exists(self.OUTPUT_FILE):
             with open(self.OUTPUT_FILE, "w") as f:
                 f.write("")
