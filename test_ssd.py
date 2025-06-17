@@ -8,12 +8,16 @@ NAND_FILE = "test_ssd_nand.txt"
 OUTPUT_FILE = "test_ssd_output.txt"
 EMPTY_DATA = "0x00000000"
 
-
 def remove_files():
     if os.path.exists(NAND_FILE):
         os.remove(NAND_FILE)
     if os.path.exists(OUTPUT_FILE):
         os.remove(OUTPUT_FILE)
+
+def assert_output_file(expected):
+    with open(OUTPUT_FILE, 'r') as f:
+        content = f.read()
+        assert content == expected
 
 @pytest.fixture
 def clean_ssd():
@@ -22,7 +26,6 @@ def clean_ssd():
     SSD.NAND_FILE = NAND_FILE
     SSD.OUTPUT_FILE = OUTPUT_FILE
     return SSD()
-
 
 def test_file_creation(clean_ssd):
     """
@@ -49,3 +52,10 @@ def test_initial_output_file(clean_ssd):
     with open(OUTPUT_FILE, 'r') as f:
         content = f.read()
         assert content == ""
+
+
+def test_read_empty_data(clean_ssd):
+    clean_ssd.run(["R", "0"])
+    assert_output_file(EMPTY_DATA)
+    clean_ssd.run(["R", f"{LBA_LENGTH-1}"])
+    assert_output_file(EMPTY_DATA)
