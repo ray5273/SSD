@@ -56,13 +56,6 @@ class TestSsdWithMock:
         ssd.run([READ_COMMAND, FIRST_ADDRESS])
         assert ssd.result == DEFAULT_DATA
 
-
-    def test_uninitialized_data(self, ssd_and_device):
-        ssd, device = ssd_and_device
-        device.read.return_value = DEFAULT_DATA
-        ssd.run([READ_COMMAND, FIRST_ADDRESS])
-        assert ssd.result == DEFAULT_DATA
-
     def test_write_data(self, ssd_and_device):
         ssd, device = ssd_and_device
         addr = FIRST_ADDRESS
