@@ -25,6 +25,8 @@ class SSD:
         self._last_result = value
 
     def run(self, params: list) -> bool:
+        params = [param.strip() for param in params]
+
         if not self._param_validator.is_valid(params):
             self.result = self.ERROR_MSG
             return False
