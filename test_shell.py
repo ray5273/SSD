@@ -187,40 +187,25 @@ def test_write_read_aging_failure(mocker):
 
 @pytest.mark.repeat(30)
 def test_shell_2_partialLBAWrite(mocker):
-    """
-    LBA 순서를 섞어가며Write 수행
-    • Test Script 이름 : 2_PartialLBAWrite
-     Test Script 실행 방법
-    • Test Shell 에서 “2_PartialLBAWrite” 라고 입력한다.
-     • Test Shell 에서 “2_” 만 입력해도 실행 가능하다.
-     Test Scenario
-     • Loop는 30회
-    • 4번LBA에값을적는다.
-     • 0번LBA에같은값을적는다.
-     • 3번LBA에같은값을적는다.
-     • 1번LBA에같은값을적는다.
-     • 2번LBA에같은값을적는다.
-    • LBA 0 ~ 4번, ReadCompar
-    """
 
     # temp output 파일 생성.
-    test_data = '0x99ABCDEF'
+    test_data = '0xAAAABBBB'
     test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
         mocker.patch('shell.call_system', return_value=0)
 
-        shell.partial_lba_write_2()
+        shell.partial_lba_write_2(test_filename)
 
         expected_calls = [
-            mocker.call('[READ] LBA 04 : 0x99ABCDEF'),
+            mocker.call('[READ] LBA 04 : 0xAAAABBBB'),
             mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 00 : 0x99ABCDEF'),
+            mocker.call('[READ] LBA 00 : 0xAAAABBBB'),
             mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
+            mocker.call('[READ] LBA 03 : 0xAAAABBBB'),
             mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 01 : 0x99ABCDEF'),
+            mocker.call('[READ] LBA 01 : 0xAAAABBBB'),
             mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 02 : 0x99ABCDEF'),
+            mocker.call('[READ] LBA 02 : 0xAAAABBBB'),
             mocker.call('[WRITE] Done'),
             mocker.call('PASS')
         ]

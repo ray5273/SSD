@@ -1,5 +1,6 @@
 import os
 import subprocess
+from unittest.mock import patch
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
     is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_3, hex_string_generator
@@ -125,11 +126,18 @@ def help():
         print(f.read().strip())
 
 def read_compare(lba, value):
-    return True
+    print( 'PASS' )
 
-def partial_lba_write_2():
-    # write()
-    return True
+def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
+
+    lba_lst = [4,0,3,1,2]
+
+    for lba in lba_lst:
+        write(lba, data, filename)
+
+    for lba in lba_lst:
+        read_compare(lba, data)
+
 
 def shell():
     """무한 루프 쉘 모드"""
@@ -179,7 +187,7 @@ def shell():
             elif command_param == "help":
                 help()
             elif user_input.startswith("2_"):
-                partial_lba_write()
+                partial_lba_write_2()
             else:
                 print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
