@@ -42,10 +42,12 @@ def read_result_file(filename):
 
 def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
+    read_data = None
     if status >= 0:
         read_data = read_result_file(filename)
         lba = int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
+    return read_data
 
 
 def fullwrite(data):
@@ -75,6 +77,7 @@ def fullread():
         print("fullread 에러 발생")
 
 def read_compare(lba, data):
+    print(lba, read(lba), data)
     if read(lba) == data:
         return "PASS"
     return "FAIL"
