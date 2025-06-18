@@ -5,6 +5,7 @@ class LBAValidator(ParameterValidatorInterface):
     MIN_NUM_RUN_PARAMETERS = 2
     NUM_WRITE_PARAMETERS = 3
     AVAILABLE_COMMANDS = ['R', 'W']
+    VALUE_LENGTH = 10
 
     def __init__(self, lba_length):
         super().__init__()
@@ -31,8 +32,11 @@ class LBAValidator(ParameterValidatorInterface):
         if command == 'W':
             if len(params) < self.NUM_WRITE_PARAMETERS:
                 return False
+            value = params[2]
+            if len(value) != self.VALUE_LENGTH:
+                return False
             try:
-                _ = int(params[2], 16)
+                _ = int(value, 16)
             except ValueError:
                 return False
         return True
