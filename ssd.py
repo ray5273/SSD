@@ -4,6 +4,9 @@ from lba_validator import LBAValidator
 
 class SSD:
     LBA_LENGTH = 100
+    ERROR_MSG = "ERROR"
+    READ_COMMAND = "R"
+    WRITE_COMMAND = "W"
 
     def __init__(self, device):
         self._device = device
@@ -22,17 +25,17 @@ class SSD:
 
     def run(self, params: list) -> bool:
         if not self._param_validator.is_valid(params):
-            self.result = "ERROR"
+            self.result = self.ERROR_MSG
             return False
 
         command, address = params[0], int(params[1])
         try:
-            if command == "R":
+            if command == self.READ_COMMAND:
                 self.result = self._device.read(address)
-            if command == "W":
+            if command == self.WRITE_COMMAND:
                 value = params[2]
                 self._device.write(address, value)
         except Exception as e:
-            self.result = "ERROR"
+            self.result = self.ERROR_MSG
             return False
         return True
