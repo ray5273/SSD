@@ -6,8 +6,6 @@ def write(lba, data):
     """write"""
     pass
 
-def read(lba):
-    pass
 def call_system(cmd:str):
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='UTF-8', check=True)  # or 'euc-kr'
