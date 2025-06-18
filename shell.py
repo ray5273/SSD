@@ -132,11 +132,12 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
 
     lba_lst = [4,0,3,1,2]
 
-    for lba in lba_lst:
-        write(lba, data, filename)
+    for _ in range(30):
+        for lba in lba_lst:
+            write(lba, data, filename)
 
-    for lba in lba_lst:
-        read_compare(lba, data)
+        for lba in [0,1,2,3,4]:
+            read_compare(lba, data)
 
 
 def shell():
