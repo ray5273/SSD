@@ -126,7 +126,7 @@ def help():
         print(f.read().strip())
 
 def read_compare(lba, value):
-    print( 'PASS' )
+    return True
 
 def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
 
@@ -137,7 +137,10 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
             write(lba, data, filename)
 
         for lba in [0,1,2,3,4]:
-            read_compare(lba, data)
+            if not read_compare(lba, data):
+                print("FAIL")
+                return
+    print("PASS")
 
 
 def shell():

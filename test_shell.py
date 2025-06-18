@@ -63,6 +63,7 @@ def test_write(mocker):
         mock_print.assert_has_calls(expected_calls)
 
 
+
 def test_shell_help(capsys):
     inputs = [
         "help",  # help() 호출
