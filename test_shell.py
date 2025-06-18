@@ -55,3 +55,13 @@ def test_write(mocker):
         ]
         mock_print.assert_has_calls(expected_calls)
 
+
+def test_write_with_invalid_lba(mocker):
+    test_data = '0x99ABCDEF'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(999, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND')
+        ]
+        mock_print.assert_has_calls(expected_calls)

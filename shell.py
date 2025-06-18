@@ -10,6 +10,15 @@ def cli():
 
 def write(lba, data, output='ssd_output.txt'):
     """write"""
+    try:
+        nlba = int(lba)
+        if not (0<= nlba <100):
+            print("INVALID COMMAND")
+            return
+    except Exception:
+        print("INVALID COMMAND")
+        return 
+
     cmd = f'python ssd.py W {lba} {data}'
     status = call_system(cmd)
     if status >= 0:
