@@ -20,19 +20,19 @@ class SSD:
         self._out_writer.write(value)
         self._last_result = value
 
-
     def run(self, params: list) -> bool:
         if not self._param_validator.is_valid(params):
+            self.result = "ERROR"
             return False
 
-        command, address = params[0], params[1]
+        command, address = params[0], int(params[1])
         try:
             if command == "R":
-                self._last_result = self._device.read(address)
-                self._out_writer.write(self._last_result)
+                self.result = self._device.read(address)
             if command == "W":
                 value = params[2]
                 self._device.write(address, value)
         except Exception as e:
+            self.result = "ERROR"
             return False
         return True
