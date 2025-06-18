@@ -35,6 +35,7 @@ class SSD:
             if command == self.WRITE_COMMAND:
                 value = params[2]
                 self._device.write(address, value)
+                self.result = ""
         except Exception as e:
             self.result = self.ERROR_MSG
             return False
