@@ -1,9 +1,55 @@
 import os
 import subprocess
 
-def write(lba, data):
-    """write"""
+
+@click.group()
+def cli():
+    """기본 CLI 명령 그룹"""
     pass
+
+def validate_lba(lba):
+    try:
+        nlba = int(lba)
+        if not (0 <= nlba < 100):
+            return False
+    except Exception:
+        return False
+    return True
+
+def validate_data(data):
+    if len(data) > 10:
+        return False
+    try:
+        value = str(data)[2:].lower()
+        for ch in value:
+            if not ( (ord('a') <= ord(ch) <= ord('f')) or (ord('0') <= ord(ch) <= ord('9')) ):
+                return False
+    except Exception:
+        return False
+    return True
+
+
+def write(lba, data, output='ssd_output.txt'):
+    """write"""
+    if not validate_lba(lba):
+        print("INVALID COMMAND : INVALID LBA")
+        return
+
+    if not validate_data(data):
+        print("INVALID COMMAND : DATA")
+        return
+
+    cmd = f'python ssd.py W {lba} {data}'
+    status = call_system(cmd)
+    if status >= 0:
+        #잘 써졌는지 결과 확인, SSD에서 write 에러 발생 시에 파일에 ERROR 출력.
+        result = read(lba, output)
+        if result == "ERROR":
+            print(f'[WRITE] Fail')
+        else:
+            print(f'[WRITE] Done')
+        return result
+    return "INVALID COMMAND : WRITE"
 
 def call_system(cmd:str):
     try:

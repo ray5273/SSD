@@ -46,6 +46,51 @@ def test_read_mock_with_valid_lba(mocker):
         shell.read(3, filename = test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
 
+def test_write(mocker):
+    # temp output 파일 생성.
+    test_data = '0x99ABCDEF'
+    test_filename = get_test_ssd_output_file(data=test_data)
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(3, '0x99ABCDEF', test_filename)
+        expected_calls = [
+            mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
+            mocker.call('[WRITE] Done')
+        ]
+        mock_print.assert_has_calls(expected_calls)
+
+
+def test_write_with_invalid_lba(mocker):
+    test_data = '0x99ABCDEF'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(999, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND : INVALID LBA')
+        ]
+        mock_print.assert_has_calls(expected_calls)
+
+def test_write_with_invalid_data(mocker):
+    #data 길이가 자릿수 초과
+    test_data = '0x99ABCDEFAAAA'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(99, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND : DATA')
+        ]
+        mock_print.assert_has_calls(expected_calls)
+
+    #data 범위 초과
+    test_data = '0x99ABCDXX'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(99, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND : DATA')
+        ]
+        mock_print.assert_has_calls(expected_calls)
+
 
 def test_shell_help(capsys):
     inputs = [
