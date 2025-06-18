@@ -11,7 +11,6 @@ class Nand:
             for i in range(lba_length):
                 f.write(f"{self.default_value}\n")
 
-
     def read(self, address) -> str:
         with open(self.data_file, 'r', encoding='utf-8') as f:
             for i, line in enumerate(f, start=0):
@@ -25,10 +24,9 @@ class Nand:
             lines = f.readlines()
 
         if address <= len(lines):
-            lines[address] = wdata+'\n'
+            lines[address] = wdata + '\n'
             with open(self.data_file, 'w', encoding='utf-8') as f:
                 f.writelines(lines)
         else:
             raise Exception
         return
-
