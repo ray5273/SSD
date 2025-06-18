@@ -1,26 +1,27 @@
-import random
 import os
+import random
+import tempfile
 from unittest.mock import patch
 
 import pytest
-import os
-import tempfile
-from shell import help, shell, MAX_LBA
 from pytest_mock import MockerFixture
 
 import shell
-import tempfile
+from shell import MAX_LBA
+
 
 def test_shell_read(mocker: MockerFixture):
     mocker.patch('shell.read', return_value='0x99999999')
     result = shell.read("3")
     assert result == "0x99999999"
 
+
 def test_call_system():
     cmd = f'dir'
     assert shell.call_system(cmd) == 0
 
-def get_test_ssd_output_file(filename = "ssd_output.txt", data='0x99999999'):
+
+def get_test_ssd_output_file(filename="ssd_output.txt", data='0x99999999'):
     # 시스템 임시 디렉터리 경로
     tmp_dir = tempfile.gettempdir()
     # 내가 지정한 임시 파일명
@@ -31,18 +32,20 @@ def get_test_ssd_output_file(filename = "ssd_output.txt", data='0x99999999'):
         f.write(data)
     return file_path
 
+
 def test_read_result_file():
     test_data = '0x99999999'
     file_path = get_test_ssd_output_file(data=test_data)
     assert shell.read_result_file(file_path) == test_data
 
+
 def test_read_mock_with_valid_lba(mocker):
-    mocker.patch('shell.call_system', return_value = 0)
-    #temp output 파일 생성.
+    mocker.patch('shell.call_system', return_value=0)
+    # temp output 파일 생성.
     test_data = '0x99ABCDEF'
     test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
-        shell.read(3, filename = test_filename)
+        shell.read(3, filename=test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
 
 def test_write(mocker):
@@ -93,8 +96,8 @@ def test_write_with_invalid_data(mocker):
 
 def test_shell_help(capsys):
     inputs = [
-        "help",       # help() 호출
-        "exit"        # 종료
+        "help",  # help() 호출
+        "exit"  # 종료
     ]
 
     with patch("builtins.input", side_effect=inputs):
@@ -108,7 +111,6 @@ def test_shell_help(capsys):
     assert "write" in output
     assert "fullread" in output
     assert "fullwrite" in output
-
 
 
 def test_fullwrite_success(mocker):
@@ -135,15 +137,19 @@ def test_fullwrite_success(mocker):
 def test_fullwrite_error_on_random_write(mocker):
     # Given : fullwrite()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
     error_lba = random.randint(0, MAX_LBA - 1)
+
     def side_effect(lba, data):
         if lba == error_lba:
             raise RuntimeError("write error")
 
+    mock_print = mocker.patch("builtins.print")
     mocker.patch("shell.write", side_effect=side_effect)
+
     # When: fullwrite()를 실행하면
-    # Then: RuntimeError가 발생해야 함.
-    with pytest.raises(RuntimeError):
-        shell.fullwrite("0xABCD")
+    shell.fullwrite("0xABCD")
+
+    # Then: fullwrite 에러 발생 print가 확인되어야함.
+    mock_print.assert_any_call("fullwrite 에러 발생")
 
 
 def test_fullread_success(mocker):
@@ -167,12 +173,14 @@ def test_fullread_success(mocker):
 def test_fullread_error_on_random_read(mocker):
     # Given : fullread()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
     error_lba = random.randint(0, MAX_LBA - 1)
+
     def side_effect(lba):
         if lba == error_lba:
             raise RuntimeError("write error")
-    mocker.patch("shell.read", side_effect=side_effect)
 
+    mocker.patch("shell.read", side_effect=side_effect)
+    mock_print = mocker.patch("builtins.print")
     # When: fullread()를 실행하면
-    # Then: RuntimeError가 발생해야 함.
-    with pytest.raises(RuntimeError):
-        shell.fullread()
+    shell.fullread()
+    # Then: fullread 에러 발생 print가 확인되어야함.
+    mock_print.assert_any_call("fullread 에러 발생")
