@@ -42,7 +42,16 @@ def test_read_mock_with_valid_lba(mocker):
         shell.read(3, filename = test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
 
-def test_write():
+def test_write(mocker):
+    # temp output 파일 생성.
+    test_data = '0x99ABCDEF'
+    test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
-        shell.write(3, '0xABCDEF123')
-        mock_print.assert_called_once_with("[WRITE] Done")
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(3, '0xABCDEF123', test_filename)
+        expected_calls = [
+            mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
+            mocker.call('[WRITE] Done')
+        ]
+        mock_print.assert_has_calls(expected_calls)
+
