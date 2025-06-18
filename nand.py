@@ -29,4 +29,3 @@ class Nand:
                 f.writelines(lines)
         else:
             raise Exception
-        return
