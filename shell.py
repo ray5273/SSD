@@ -77,7 +77,6 @@ def fullread():
         print("fullread 에러 발생")
 
 def read_compare(lba, data):
-    print(lba, read(lba), data)
     if read(lba) == data:
         return "PASS"
     return "FAIL"
