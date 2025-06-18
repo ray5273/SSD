@@ -1,0 +1,31 @@
+📌 팀명: Ant
+   팀장: 박상혁
+   팀원: 이지수, 정연호, 이재훈, 박중규, 황소진
+
+📌 write 명령어
+지정한 LBA(논리 블록 주소)에 특정 값을 기록합니다.
+
+사용 예시:
+  write 3 0xAAAABBBB
+→ 3번 LBA에 0xAAAABBBB 값을 저장합니다.
+
+📌 read 명령어
+지정한 LBA(논리 블록 주소)에서 값을 읽어 출력합니다.
+
+사용 예시:
+  read 3
+→ 3번 LBA에서 값을 읽고 결과를 출력합니다.
+
+📌 fullwrite 명령어
+모든 LBA(0~99)에 지정한 동일한 값을 기록합니다.
+사용 예시:
+  fullwrite 0xABCDFFFF
+-> 모든 LBA에 값 0xABCDFFFF가 적힌다.
+
+📌 fullread 명령어
+전체 영역(LBA 0~99)의 데이터를 읽고 한꺼번에 출력합니다.
+
+사용 예시:
+  fullread
+→ SSD의 모든 LBA를 순서대로 읽어 화면에 출력합니다.
+
