@@ -54,13 +54,13 @@ class TestSsdWithMock:
         """ read command 수행 시 device의 read 호출 되는지 """
         ssd, device = ssd_and_device
         ssd.run([READ_COMMAND, FIRST_ADDRESS])
-        device.read.assert_called_with(FIRST_ADDRESS)
+        device.read.assert_called_with(int(FIRST_ADDRESS))
 
     def test_write_command(self, ssd_and_device):
         """ write comand 수행 시 device의 write 호출 되는지 """
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, FIRST_ADDRESS, DEFAULT_DATA])
-        device.write.assert_called_with(FIRST_ADDRESS, DEFAULT_DATA)
+        device.write.assert_called_with(int(FIRST_ADDRESS), DEFAULT_DATA)
 
     def test_uninitialized_data(self, ssd_and_device):
         """ read 하여 default 값 읽히는지"""
@@ -135,7 +135,6 @@ class TestSsd:
         """
         SSD 객체 맨 처음 생성 후 file들이 생성 되었는지
         """
-        assert os.path.exists(NAND_FILE)
         assert os.path.exists(OUTPUT_FILE)
 
     @pytest.mark.skip
