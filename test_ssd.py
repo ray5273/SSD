@@ -53,7 +53,7 @@ def ssd_and_device(mocker):
 def test_uninitialized_data_with_mock_device(ssd_and_device):
     ssd, device = ssd_and_device
     device.read.return_value = DEFAULT_DATA
-    ssd.run(READ_COMMAND, FIRST_ADDRESS)
+    ssd.run([READ_COMMAND, FIRST_ADDRESS])
     assert ssd.result == DEFAULT_DATA
 
 def test_write_data_with_mock_device(ssd_and_device):
@@ -61,22 +61,42 @@ def test_write_data_with_mock_device(ssd_and_device):
     addr = FIRST_ADDRESS
     data = "0x1234abcd"
     device.read.return_value = data
-    ssd.run(WRITE_COMMAND, addr, data)
-    ssd.run(READ_COMMAND, addr)
+    ssd.run([WRITE_COMMAND, addr, data])
+    ssd.run([READ_COMMAND, addr])
     assert ssd.result == data
 
 def test_read_out_of_bounds_with_mock_device(ssd_and_device):
     ssd, device = ssd_and_device
     addr = "9999999"
     device.read.side_effect = Exception()
-    ssd.run(READ_COMMAND, addr)
+    ssd.run([READ_COMMAND, addr])
     assert ssd.result == "ERROR"
 
 def test_write_out_of_bounds_with_mock_device(ssd_and_device):
     ssd, device = ssd_and_device
     addr = "1000000"
     device.write.side_effect = Exception()
-    ssd.run(WRITE_COMMAND, addr, DEFAULT_DATA)
+    ssd.run([WRITE_COMMAND, addr, DEFAULT_DATA])
+    assert ssd.result == "ERROR"
+
+def test_invalid_command_with_mock_device(ssd_and_device):
+    ssd, device = ssd_and_device
+    ssd.run(["UNKNOWN_COMMAND", FIRST_ADDRESS])
+    assert ssd.result == "ERROR"
+
+def test_invalid_read_address_with_mock_device(ssd_and_device):
+    ssd, device = ssd_and_device
+    ssd.run([READ_COMMAND, "address"])
+    assert ssd.result == "ERROR"
+
+def test_invalid_write_address_with_mock_device(ssd_and_device):
+    ssd, device = ssd_and_device
+    ssd.run(WRITE_COMMAND, "address")
+    assert ssd.result == "ERROR"
+
+def test_invalid_write_data_with_mock_device(ssd_and_device):
+    ssd, device = ssd_and_device
+    ssd.run(WRITE_COMMAND, FIRST_ADDRESS, "invalid_data")
     assert ssd.result == "ERROR"
 
 
