@@ -28,8 +28,11 @@ class LBAValidator(ParameterValidatorInterface):
         if address >= self.lba_length:
             return False
 
-        if command == 'W' and (len(params) < self.NUM_WRITE_PARAMETERS or
-            not params[2].isdigit()):
-            return False
-
+        if command == 'W':
+            if len(params) < self.NUM_WRITE_PARAMETERS:
+                return False
+            try:
+                _ = int(params[2], 16)
+            except ValueError:
+                return False
         return True
