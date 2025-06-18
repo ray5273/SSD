@@ -1,3 +1,4 @@
+import click
 import os
 import subprocess
 from unittest.mock import patch
@@ -36,7 +37,7 @@ def call_system(cmd: str):
 
 def read_result_file(filename):
     line = None
-    with open(filename, 'r') as f:  # TODO encoding 확인 필요
+    with open(filename, 'r' ) as f: #TODO encoding 확인 필요
         line = f.read()
     return line
 
@@ -45,7 +46,7 @@ def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
     if status >= 0:
         read_data = read_result_file(filename)
-        lba = int(lba)
+        lba=int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
 
 
