@@ -41,3 +41,8 @@ def test_read_mock_with_valid_lba(mocker):
     with patch('builtins.print') as mock_print:
         shell.read(3, filename = test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
+
+def test_write():
+    with patch('builtins.print') as mock_print:
+        shell.write(3, '0xABCDEF123')
+        mock_print.assert_called_once_with("[WRITE] Done")

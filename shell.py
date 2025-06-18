@@ -7,12 +7,10 @@ def cli():
     """기본 CLI 명령 그룹"""
     pass
 
-@cli.command(name="write")
-@click.argument('lba')
-@click.argument('data')
+
 def write(lba, data):
     """write"""
-    pass
+    print(f'[WRITE] Done')
 
 def call_system(cmd:str):
     try:
