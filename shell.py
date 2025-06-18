@@ -183,7 +183,7 @@ def shell():
                 fullread()
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
-            elif TEST_SCRIPT_1.startswith("2_"):
+            elif TEST_SCRIPT_2.startswith(command_param):
                 print(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
