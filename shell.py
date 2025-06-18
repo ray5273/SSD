@@ -2,18 +2,12 @@ import click
 import os
 import subprocess
 
-@click.group()
-def cli():
-    """기본 CLI 명령 그룹"""
-    pass
-
-@cli.command(name="write")
-@click.argument('lba')
-@click.argument('data')
 def write(lba, data):
     """write"""
     pass
 
+def read(lba):
+    pass
 def call_system(cmd:str):
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='UTF-8', check=True)  # or 'euc-kr'
@@ -37,19 +31,15 @@ def read(lba, filename = 'ssd_output.txt'):
         lba=int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
 
-@cli.command(name="fullwrite")
 def fullwrite():
     pass
 
-@cli.command(name="fullread")
 def fullread():
     pass
 
-@cli.command(name="help")
 def help():
-    click.echo("help me")
+    return True
 
-@cli.command()
 def shell():
     """무한 루프 쉘 모드"""
     click.echo("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
@@ -70,8 +60,7 @@ def shell():
             elif user_input == "fullread":
                 fullread.callback()
             elif user_input == "help":
-                help.callback()
-                click.echo("help")
+                help()
             else:
                 click.echo("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
@@ -80,5 +69,5 @@ def shell():
 
 
 if __name__ == '__main__':
-        cli()
-        
+        shell()
+

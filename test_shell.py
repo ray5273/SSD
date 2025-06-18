@@ -3,6 +3,10 @@ import os
 from unittest.mock import patch
 
 import pytest
+import os
+import tempfile
+
+from shell import help, shell
 from pytest_mock import MockerFixture
 
 import shell
@@ -41,3 +45,22 @@ def test_read_mock_with_valid_lba(mocker):
     with patch('builtins.print') as mock_print:
         shell.read(3, filename = test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
+
+
+def test_shell_help(capsys):
+    inputs = [
+        "help",       # help() 호출
+        "exit"        # 종료
+    ]
+
+    with patch("builtins.input", side_effect=inputs):
+        shell()
+
+    output = capsys.readouterr().out
+
+    assert "팀명" in output
+    assert "팀장" in output
+    assert "read" in output
+    assert "write" in output
+    assert "fullread" in output
+    assert "fullwrite" in output
