@@ -79,6 +79,16 @@ class TestSsdWithMock:
         ssd.run([READ_COMMAND, addr])
         assert ssd.result == data
 
+    def test_read_minus_address(self, ssd_and_device):
+        ssd, device = ssd_and_device
+        ssd.run([READ_COMMAND, "-1"])
+        assert ssd.result == "ERROR"
+
+    def test_write_minus_address(self, ssd_and_device):
+        ssd, device = ssd_and_device
+        ssd.run([WRITE_COMMAND, "-1", DEFAULT_DATA])
+        assert ssd.result == "ERROR"
+
     def test_read_out_of_bounds(self, ssd_and_device):
         """ addr 범위 밖 read 하는 경우 -> ERROR """
         ssd, device = ssd_and_device
