@@ -183,3 +183,18 @@ def test_write_read_aging_failure(mocker):
     # read_compare는 항상 "PASS" 반환
     mocker.patch('shell.read_compare', return_value="FAIL")
     assert shell.write_read_aging() == "FAIL"
+
+
+def test_partial_lba_write_2_pass(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="PASS")
+    assert shell.partial_lba_write_2() == "PASS"
+
+def test_partial_lba_write_2_fail(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="FAIL")
+    assert shell.partial_lba_write_2() == "FAIL"

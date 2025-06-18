@@ -1,8 +1,9 @@
+import click
 import os
 import subprocess
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_3, hex_string_generator
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
@@ -44,7 +45,7 @@ def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
     if status >= 0:
         read_data = read_result_file(filename)
-        lba = int(lba)
+        lba=int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
 
 
@@ -74,7 +75,7 @@ def fullread():
     except:
         print("fullread 에러 발생")
 
-def read_compare(lba, data):
+def read_compare(lba, data, filename='ssd_output.txt'):
     if read(lba) == data:
         return "PASS"
     return "FAIL"
@@ -88,7 +89,7 @@ def write_and_read_compare_in_range(data, start, end):
             return result
     return 'PASS'
 
-def full_write_and_read_compare():
+def full_write_and_read_compare(output='ssd_output.txt'):
     data = {}
     for idx, i in enumerate(range(0x00000001, 0x00000101), start=0):
         data[idx] = f"0x{i:08X}"
@@ -123,6 +124,20 @@ def help():
 
     with open(path, encoding="utf-8") as f:
         print(f.read().strip())
+
+
+def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
+
+    lba_lst = [4,0,3,1,2]
+
+    for _ in range(30):
+        for lba in lba_lst:
+            write(lba, data, filename)
+
+        for lba in [0,1,2,3,4]:
+            if read_compare(lba, data, filename) == "FAIL":
+                return "FAIL"
+    return "PASS"
 
 
 def shell():
@@ -168,6 +183,8 @@ def shell():
                 fullread()
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
+            elif TEST_SCRIPT_2.startswith(command_param):
+                print(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
             elif command_param == "help":
