@@ -66,3 +66,13 @@ def test_write_with_invalid_lba(mocker):
         ]
         mock_print.assert_has_calls(expected_calls)
 
+def test_write_with_invalid_data(mocker):
+    #data 길이가 자릿수 초과
+    test_data = '0x99ABCDEFAAAA'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(99, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND')
+        ]
+        mock_print.assert_has_calls(expected_calls)

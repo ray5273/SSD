@@ -23,6 +23,10 @@ def write(lba, data, output='ssd_output.txt'):
         print("INVALID COMMAND")
         return
 
+    if len(data) > 10:
+        print("INVALID COMMAND")
+        return
+
     cmd = f'python ssd.py W {lba} {data}'
     status = call_system(cmd)
     if status >= 0:
