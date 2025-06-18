@@ -82,12 +82,12 @@ class TestSsdWithMock:
     def test_read_minus_address(self, ssd_and_device):
         ssd, device = ssd_and_device
         ssd.run([READ_COMMAND, "-1"])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_write_minus_address(self, ssd_and_device):
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, "-1", DEFAULT_DATA])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_read_out_of_bounds(self, ssd_and_device):
         """ addr 범위 밖 read 하는 경우 -> ERROR """
@@ -95,7 +95,7 @@ class TestSsdWithMock:
         addr = "9999999"
         device.read.side_effect = Exception()
         ssd.run([READ_COMMAND, addr])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_write_out_of_bounds(self, ssd_and_device):
         """ addr 범위 밖 write 하는 경우 -> ERROR """
@@ -103,31 +103,31 @@ class TestSsdWithMock:
         addr = "1000000"
         device.write.side_effect = Exception()
         ssd.run([WRITE_COMMAND, addr, DEFAULT_DATA])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_invalid_command(self, ssd_and_device):
         """ 정의되지 않은 command가 들어오는 경우 -> ERROR"""
         ssd, device = ssd_and_device
         ssd.run(["UNKNOWN_COMMAND", FIRST_ADDRESS])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_invalid_read_address(self, ssd_and_device):
         """ address 형식이 올바르지 않은 경우 read  -> ERROR """
         ssd, device = ssd_and_device
         ssd.run([READ_COMMAND, "address"])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_invalid_write_address(self, ssd_and_device):
         """ address 형식이 올바르지 않은 경우 write -> ERROR"""
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, "address"])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
     def test_invalid_write_data(self, ssd_and_device):
         """ write data 형식이 hex가 아닐 때 -> ERROR """
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, FIRST_ADDRESS, "invalid_data"])
-        assert ssd.result == "ERROR"
+        assert ssd.result == ERROR_MESSAGE
 
 class TestSsd:
     @pytest.mark.skip
