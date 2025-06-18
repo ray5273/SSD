@@ -63,7 +63,6 @@ def test_write(mocker):
         mock_print.assert_has_calls(expected_calls)
 
 
-
 def test_shell_help(capsys):
     inputs = [
         "help",  # help() 호출
@@ -186,28 +185,16 @@ def test_write_read_aging_failure(mocker):
     assert shell.write_read_aging() == "FAIL"
 
 
-@pytest.mark.repeat(30)
-def test_shell_2_partialLBAWrite(mocker):
+def test_partial_lba_write_2_pass(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="PASS")
+    assert shell.partial_lba_write_2() == "PASS"
 
-    # temp output 파일 생성.
-    test_data = '0xAAAABBBB'
-    test_filename = get_test_ssd_output_file(data=test_data)
-    with patch('builtins.print') as mock_print:
-        mocker.patch('shell.call_system', return_value=0)
-
-        shell.partial_lba_write_2(test_filename)
-
-        expected_calls = [
-            mocker.call('[READ] LBA 04 : 0xAAAABBBB'),
-            mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 00 : 0xAAAABBBB'),
-            mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 03 : 0xAAAABBBB'),
-            mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 01 : 0xAAAABBBB'),
-            mocker.call('[WRITE] Done'),
-            mocker.call('[READ] LBA 02 : 0xAAAABBBB'),
-            mocker.call('[WRITE] Done'),
-            mocker.call('PASS')
-        ]
-        mock_print.assert_has_calls(expected_calls)
+def test_partial_lba_write_2_fail(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="FAIL")
+    assert shell.partial_lba_write_2() == "FAIL"

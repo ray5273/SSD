@@ -3,6 +3,7 @@ import re
 
 MAX_LBA = 100
 TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
+TEST_SCRIPT_2 = "2_PartialLBAWrite"
 TEST_SCRIPT_3 = "3_WriteReadAging"
 
 
@@ -56,9 +57,9 @@ def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
 
 def is_valid_command(command_param):
     valid_command_list = ["write", "read", "fullwrite", "fullread", "help", "exit"]
-    if command_param != "" and TEST_SCRIPT_1.startswith(command_param):
-        return True
-    if command_param != "" and TEST_SCRIPT_3.startswith(command_param):
+    if command_param != "" and TEST_SCRIPT_1.startswith(command_param) \
+            and TEST_SCRIPT_2.startswith(command_param) \
+            and TEST_SCRIPT_3.startswith(command_param):
         return True
     if command_param in valid_command_list:
         return True

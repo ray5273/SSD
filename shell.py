@@ -1,10 +1,8 @@
-import click
 import os
 import subprocess
-from unittest.mock import patch
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_3, hex_string_generator
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
@@ -37,7 +35,7 @@ def call_system(cmd: str):
 
 def read_result_file(filename):
     line = None
-    with open(filename, 'r' ) as f: #TODO encoding 확인 필요
+    with open(filename, 'r') as f:  # TODO encoding 확인 필요
         line = f.read()
     return line
 
@@ -46,7 +44,7 @@ def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
     if status >= 0:
         read_data = read_result_file(filename)
-        lba=int(lba)
+        lba = int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
 
 
@@ -90,7 +88,7 @@ def write_and_read_compare_in_range(data, start, end):
             return result
     return 'PASS'
 
-def full_write_and_read_compare():
+def full_write_and_read_compare(output='ssd_output.txt'):
     data = {}
     for idx, i in enumerate(range(0x00000001, 0x00000101), start=0):
         data[idx] = f"0x{i:08X}"
@@ -126,8 +124,6 @@ def help():
     with open(path, encoding="utf-8") as f:
         print(f.read().strip())
 
-def read_compare(lba, value):
-    return True
 
 def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
 
@@ -187,12 +183,12 @@ def shell():
                 fullread()
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
+            elif TEST_SCRIPT_1.startswith("2_"):
+                partial_lba_write_2()
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
             elif command_param == "help":
                 help()
-            elif user_input.startswith("2_"):
-                partial_lba_write_2()
             else:
                 print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
@@ -202,4 +198,3 @@ def shell():
 
 if __name__ == '__main__':
     shell()
-
