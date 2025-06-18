@@ -8,9 +8,19 @@ def cli():
     pass
 
 
-def write(lba, data):
+def write(lba, data, output='ssd_output.txt'):
     """write"""
-    print(f'[WRITE] Done')
+    cmd = f'python ssd.py W {lba} {data}'
+    status = call_system(cmd)
+    if status >= 0:
+        #잘 써졌는지 결과 확인, SSD에서 write 에러 발생 시에 파일에 ERROR 출력.
+        result = read(lba, output)
+        if result == "ERROR":
+            print(f'[WRITE] Fail')
+        else:
+            print(f'[WRITE] Done')
+        return result
+    return "INVALID COMMAND : WRITE"
 
 def call_system(cmd:str):
     try:
