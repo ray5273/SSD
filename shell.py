@@ -74,6 +74,32 @@ def fullread():
     except:
         print("fullread 에러 발생")
 
+def read_compare(lba, data):
+    if read(lba) == data:
+        return "PASS"
+    return "FAIL"
+
+def write_and_read_compare_in_range(data, start, end):
+    for i in range(start,end):
+        write(i, data[i])
+    for i in range(start,end):
+        result = read_compare(i, data[i])
+        if result == 'FAIL':
+            return result
+    return 'PASS'
+
+def full_write_and_read_compare(output='ssd_output.txt'):
+    data = {}
+    for idx, i in enumerate(range(0x00000001, 0x00000101), start=0):
+        data[idx] = f"0x{i:08X}"
+
+    step = 5
+    for i in range(0, 100, step):
+        result = write_and_read_compare_in_range(data, i, i+step)
+        if result =="FAIL":
+            return result
+
+    return "PASS"
 
 def help():
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -84,6 +110,7 @@ def help():
 
 
 def shell():
+    TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
     """무한 루프 쉘 모드"""
     print("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
     while True:
@@ -124,6 +151,8 @@ def shell():
                 fullwrite(data=data_str)
             elif command_param == "fullread":
                 fullread()
+            elif TEST_SCRIPT_1.startswith(command_param):
+                print(full_write_and_read_compare())
             elif command_param == "help":
                 help()
             else:

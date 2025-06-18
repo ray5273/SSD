@@ -21,7 +21,7 @@ def test_call_system():
     assert shell.call_system(cmd) == 0
 
 
-def get_test_ssd_output_file(filename="ssd_output.txt", data='0x99999999'):
+def get_test_ssd_output_file(filename="ssd_output.txt", data='0x00000000'):
     # 시스템 임시 디렉터리 경로
     tmp_dir = tempfile.gettempdir()
     # 내가 지정한 임시 파일명
@@ -153,3 +153,20 @@ def test_fullread_error_on_random_read(mocker):
     shell.fullread()
     # Then: fullread 에러 발생 print가 확인되어야함.
     mock_print.assert_any_call("fullread 에러 발생")
+
+
+def test_TestScript1(mocker):
+    mock_ssd = {}
+    def mock_write(lba, data):
+        mock_ssd[lba] = data
+    def mock_read(lba):
+        return mock_ssd[lba]
+    mocker.patch('shell.call_system', return_value=0)
+    mocker.patch('shell.write', side_effect = mock_write)
+    mocker.patch('shell.read', side_effect=mock_read)
+    assert shell.full_write_and_read_compare() == "PASS"
+
+@pytest.mark.skip
+def test_TestScript1_with_shell_command():
+    ...
+
