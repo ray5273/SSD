@@ -40,3 +40,9 @@ def test_nand_write_out_of_bounds(nand):
     wdata = "0x00000000"
     with pytest.raises(Exception):
         nand.write(addr, wdata)
+
+def test_nand_write_at_bound(nand):
+    addr = LAST_ADDRESS + 1
+    wdata = "0x1234abcd"
+    nand.write(addr, wdata)
+    assert nand.read(addr) == wdata
