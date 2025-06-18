@@ -4,6 +4,7 @@ from parameter_validator_interface import ParameterValidatorInterface
 class LBAValidator(ParameterValidatorInterface):
     MIN_NUM_RUN_PARAMETERS = 2
     NUM_WRITE_PARAMETERS = 3
+    NUM_READ_PARAMETERS = 2
     AVAILABLE_COMMANDS = ['R', 'W']
     VALUE_LENGTH = 10
 
@@ -25,12 +26,12 @@ class LBAValidator(ParameterValidatorInterface):
         address = int(address)
         if command not in self.AVAILABLE_COMMANDS:
             return False
-
-        if address >= self.lba_length:
+        if address >= self.lba_length or address < 0:
             return False
-
+        if command == 'R' and len(params) != self.NUM_READ_PARAMETERS:
+            return False
         if command == 'W':
-            if len(params) < self.NUM_WRITE_PARAMETERS:
+            if len(params) != self.NUM_WRITE_PARAMETERS:
                 return False
             value = params[2]
             if len(value) != self.VALUE_LENGTH:
