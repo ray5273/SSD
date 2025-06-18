@@ -7,10 +7,10 @@ class SSD:
     ERROR_MSG = "ERROR"
     READ_COMMAND = "R"
     WRITE_COMMAND = "W"
-
+    OUTPUT_FILE = "ssd_output.txt"
     def __init__(self, device):
         self._device = device
-        self._out_writer = FileOutput()
+        self._out_writer = FileOutput(self.OUTPUT_FILE)
         self._last_result = None
         self._param_validator = LBAValidator(self.LBA_LENGTH)
 
