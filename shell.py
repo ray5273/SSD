@@ -1,4 +1,3 @@
-import click
 import os
 import subprocess
 
@@ -40,7 +39,7 @@ def help():
     path = os.path.join(current_dir, "help.txt")
 
     with open(path, encoding="utf-8") as f:
-        click.echo(f.read().strip())
+        print(f.read().strip())
 
 def shell():
     """무한 루프 쉘 모드"""
