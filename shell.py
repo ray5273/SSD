@@ -38,7 +38,11 @@ def fullread():
     pass
 
 def help():
-    return True
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(current_dir, "help.txt")
+
+    with open(path, encoding="utf-8") as f:
+        click.echo(f.read().strip())
 
 def shell():
     """무한 루프 쉘 모드"""
