@@ -195,7 +195,9 @@ class TestSsd:
             assert_output_file(expected_data)
 
     def test_write_success(self, clean_ssd):
+        clean_ssd.run([READ_COMMAND, FIRST_ADDRESS])
         clean_ssd.run([WRITE_COMMAND, FIRST_ADDRESS, DEFAULT_DATA])
+
         assert_output_file(WRITE_SUCCESS_MESSAGE)
 
     def test_out_of_lba_range_read(self, clean_ssd):
