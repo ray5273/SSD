@@ -20,7 +20,10 @@ def validate_data(data):
     if len(data) > 10:
         return False
     try:
-        value = int(data)
+        value = str(data)[2:].lower()
+        for ch in value:
+            if not ( (ord('a') <= ord(ch) <= ord('f')) or (ord('0') <= ord(ch) <= ord('9')) ):
+                return False
     except Exception:
         return False
     return True
@@ -29,7 +32,7 @@ def validate_data(data):
 def write(lba, data, output='ssd_output.txt'):
     """write"""
     if not validate_lba(lba):
-        print("INVALID COMMAND")
+        print("INVALID COMMAND : INVALID LBA")
         return
 
     if not validate_data(data):

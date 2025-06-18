@@ -48,7 +48,7 @@ def test_write(mocker):
     test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
         mocker.patch('shell.call_system', return_value=0)
-        shell.write(3, '0xABCDEF123', test_filename)
+        shell.write(3, '0x99ABCDEF', test_filename)
         expected_calls = [
             mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
             mocker.call('[WRITE] Done')
@@ -62,7 +62,7 @@ def test_write_with_invalid_lba(mocker):
         mocker.patch('shell.call_system', return_value=0)
         shell.write(999, test_data)
         expected_calls = [
-            mocker.call('INVALID COMMAND')
+            mocker.call('INVALID COMMAND : INVALID LBA')
         ]
         mock_print.assert_has_calls(expected_calls)
 
@@ -86,3 +86,4 @@ def test_write_with_invalid_data(mocker):
             mocker.call('INVALID COMMAND : DATA')
         ]
         mock_print.assert_has_calls(expected_calls)
+
