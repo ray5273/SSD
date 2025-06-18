@@ -43,10 +43,12 @@ def read_result_file(filename):
 
 def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
+    read_data = None
     if status >= 0:
         read_data = read_result_file(filename)
         lba=int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
+    return read_data
 
 
 def fullwrite(data):
