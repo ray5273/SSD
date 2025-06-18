@@ -1,12 +1,11 @@
-
+import random
 import os
 from unittest.mock import patch
 
 import pytest
 import os
 import tempfile
-
-from shell import help, shell
+from shell import help, shell, MAX_LBA
 from pytest_mock import MockerFixture
 
 import shell
@@ -99,7 +98,7 @@ def test_shell_help(capsys):
     ]
 
     with patch("builtins.input", side_effect=inputs):
-        shell()
+        shell.shell()
 
     output = capsys.readouterr().out
 
@@ -109,3 +108,71 @@ def test_shell_help(capsys):
     assert "write" in output
     assert "fullread" in output
     assert "fullwrite" in output
+
+
+
+def test_fullwrite_success(mocker):
+    # Given : write() 함수를 mocking함.
+    # test_data에 data를 담아줌
+    mock_write = mocker.patch("shell.write")
+    test_data = "0xABCD"
+
+    # When : fullwrite(data)를 실행
+    shell.fullwrite(test_data)
+
+    # Then : MAX_LBA 만큼 write()가 실행되어야함.
+    assert mock_write.call_count == MAX_LBA
+
+    # Then : 각 호출의 파라미터 확인, lba와 test_data가 parameter로 잘 들어갔는지 확인
+    expected_lba = 0
+    for args_lba, call in enumerate(mock_write.call_args_list):
+        assert args_lba == expected_lba  # lba가 0~99 순서대로 들어가는지
+        assert call.args[1] == test_data  # data가 올바른지
+        expected_lba += 1
+
+
+@pytest.mark.repeat(100)
+def test_fullwrite_error_on_random_write(mocker):
+    # Given : fullwrite()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
+    error_lba = random.randint(0, MAX_LBA - 1)
+    def side_effect(lba, data):
+        if lba == error_lba:
+            raise RuntimeError("write error")
+
+    mocker.patch("shell.write", side_effect=side_effect)
+    # When: fullwrite()를 실행하면
+    # Then: RuntimeError가 발생해야 함.
+    with pytest.raises(RuntimeError):
+        shell.fullwrite("0xABCD")
+
+
+def test_fullread_success(mocker):
+    # Given : read() 함수 동작을 mocking함.
+    mock_read = mocker.patch("shell.read")
+
+    # When : fullread()를 실행
+    shell.fullread()
+
+    # Then : MAX_LBA만큼 read()가 실행되어야함.
+    assert mock_read.call_count == MAX_LBA
+
+    # Then : 각 lba가 각 순서대로 호출이 되는지 확인
+    expected_lba = 0
+    for args_lba, call in enumerate(mock_read.call_args_list):
+        assert args_lba == expected_lba
+        expected_lba += 1
+
+
+@pytest.mark.repeat(100)
+def test_fullread_error_on_random_read(mocker):
+    # Given : fullread()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
+    error_lba = random.randint(0, MAX_LBA - 1)
+    def side_effect(lba):
+        if lba == error_lba:
+            raise RuntimeError("write error")
+    mocker.patch("shell.read", side_effect=side_effect)
+
+    # When: fullread()를 실행하면
+    # Then: RuntimeError가 발생해야 함.
+    with pytest.raises(RuntimeError):
+        shell.fullread()

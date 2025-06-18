@@ -1,11 +1,8 @@
 import os
 import subprocess
 
-
-@click.group()
-def cli():
-    """기본 CLI 명령 그룹"""
-    pass
+# SSD 테스트에 쓰이는 constants
+MAX_LBA = 100
 
 def validate_lba(lba):
     try:
@@ -74,11 +71,35 @@ def read(lba, filename = 'ssd_output.txt'):
         lba=int(lba)
         print(f'[READ] LBA {lba:02d} : {read_data}')
 
-def fullwrite():
-    pass
+
+def fullwrite(data):
+    """
+    모든 LBA 영역에 대해 Write 를 수행한다
+    모든 LBA 에 값 0xABCDFFF 가 적힌다
+
+    Usage:
+        Shell > fullwrite 0xABCDFFFF
+    """
+    try:
+        for lba in range(MAX_LBA):
+            write(lba, data)
+    except:
+        print("fullwrite 에러 발생")
+        raise RuntimeError
+
 
 def fullread():
-    pass
+    """
+    LBA 0 번부터 MAX_LBA - 1 번 까지 Read 를 수행한다
+    ssd 전체 값을 모두 화면에 출력한다
+    """
+    try:
+        for lba in range(MAX_LBA):
+            read(lba)
+    except:
+        print("fullread 에러 발생")
+        raise RuntimeError
+
 
 def help():
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -89,12 +110,12 @@ def help():
 
 def shell():
     """무한 루프 쉘 모드"""
-    click.echo("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
+    print("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
     while True:
         try:
             user_input = input("Shell > ").strip()
             if user_input in ('exit', 'quit'):
-                click.echo("👋 종료합니다.")
+                print("👋 종료합니다.")
                 break
             elif user_input.startswith("write"):
                 # 인자 check 및 에러 처리 필요
@@ -102,19 +123,19 @@ def shell():
             elif user_input.startswith("read"):
                 # 인자 check 및 에러 처리 필요
                 read(3)
-            elif user_input == "fullwrite":
-                fullwrite()
-            elif user_input == "fullread":
+            elif user_input.startswith("fullwrite"):
+                data = user_input.split()[1]
+                fullwrite(data)
+            elif user_input.startswith("fullread"):
                 fullread()
             elif user_input == "help":
                 help()
             else:
-                click.echo("❓ 알 수 없는 명령입니다.")
+                print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
-            click.echo("\n👋 종료합니다.")
+            print("\n👋 종료합니다.")
             break
 
 
 if __name__ == '__main__':
-        shell()
-
+    shell()
