@@ -55,14 +55,14 @@ def shell():
                 break
             elif user_input.startswith("write"):
                 # 인자 check 및 에러 처리 필요
-                write.callback(3, 0xAAAABBBB)
+                write(3, 0xAAAABBBB)
             elif user_input.startswith("read"):
                 # 인자 check 및 에러 처리 필요
-                read.callback(3)
+                read(3)
             elif user_input == "fullwrite":
-                fullwrite.callback()
+                fullwrite()
             elif user_input == "fullread":
-                fullread.callback()
+                fullread()
             elif user_input == "help":
                 help()
             else:
