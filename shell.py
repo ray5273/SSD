@@ -7,17 +7,21 @@ def cli():
     """기본 CLI 명령 그룹"""
     pass
 
+def validate_lba(lba):
+    try:
+        nlba = int(lba)
+        if not (0 <= nlba < 100):
+            return False
+    except Exception:
+        return False
+    return True
+
 
 def write(lba, data, output='ssd_output.txt'):
     """write"""
-    try:
-        nlba = int(lba)
-        if not (0<= nlba <100):
-            print("INVALID COMMAND")
-            return
-    except Exception:
+    if not validate_lba(lba):
         print("INVALID COMMAND")
-        return 
+        return
 
     cmd = f'python ssd.py W {lba} {data}'
     status = call_system(cmd)

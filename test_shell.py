@@ -65,3 +65,4 @@ def test_write_with_invalid_lba(mocker):
             mocker.call('INVALID COMMAND')
         ]
         mock_print.assert_has_calls(expected_calls)
+
