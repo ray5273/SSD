@@ -17,6 +17,7 @@ READ_COMMAND = "R"
 ERROR_MESSAGE = "ERROR"
 FIRST_ADDRESS = "0"
 LAST_ADDRESS = f"{LBA_LENGTH-1}"
+WRITE_SUCCESS_MESSAGE = ""
 
 def remove_files():
     if os.path.exists(NAND_FILE):
@@ -144,8 +145,8 @@ class TestSsd:
             lines = f.readlines()
             first_line = lines[0].strip()
             last_line = lines[-1].strip()
-            assert first_line == f"0 {DEFAULT_DATA}"
-            assert last_line == f"{LBA_LENGTH-1} {DEFAULT_DATA}"
+            assert first_line == f"{DEFAULT_DATA}"
+            assert last_line == f"{DEFAULT_DATA}"
 
     def test_initial_output_file(self, clean_ssd):
         """
@@ -193,6 +194,9 @@ class TestSsd:
             clean_ssd.run([READ_COMMAND, addr])
             assert_output_file(expected_data)
 
+    def test_write_success(self, clean_ssd):
+        clean_ssd.run([WRITE_COMMAND, FIRST_ADDRESS, DEFAULT_DATA])
+        assert_output_file(WRITE_SUCCESS_MESSAGE)
 
     def test_out_of_lba_range_read(self, clean_ssd):
         clean_ssd.run([READ_COMMAND, f"{LBA_LENGTH}"])
