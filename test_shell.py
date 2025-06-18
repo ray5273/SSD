@@ -76,3 +76,13 @@ def test_write_with_invalid_data(mocker):
             mocker.call('INVALID COMMAND')
         ]
         mock_print.assert_has_calls(expected_calls)
+
+    #data 범위 초과
+    test_data = '0x99ABCDXX'
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.write(99, test_data)
+        expected_calls = [
+            mocker.call('INVALID COMMAND : DATA RANGE')
+        ]
+        mock_print.assert_has_calls(expected_calls)
