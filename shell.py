@@ -23,8 +23,11 @@ def call_system(cmd:str):
     return result.returncode
 
 
-def read_result_file():
-    pass
+def read_result_file(filename = 'ssd_output.txt'):
+    line = None
+    with open(filename, 'r' ) as f: #TODO encoding 확인 필요
+        line = f.read()
+    return line
 
 @cli.command(name="read")
 @click.argument('lba')
