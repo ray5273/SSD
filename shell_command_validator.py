@@ -83,7 +83,7 @@ def is_valid_data(data):
     0x 또는 0X로 시작하고, 그 뒤에 8자리 A~F, 0~9로만 이루어진 16진수 문자열인지 확인
     예: 0x1234ABCD (총 10글자)
     """
-    return bool(re.fullmatch(r'0[xX][A-Fa-f0-9]{8}', str(data)))
+    return bool(re.fullmatch(r'0[x][A-F0-9]{8}', str(data)))
 
 
 def hex_string_generator():
@@ -93,8 +93,8 @@ def hex_string_generator():
     :return
         candidate: 위 조건을 만족하는 string
     """
-    prefix_options = ['0x', '0X']
-    hex_digits = '0123456789ABCDEFabcdef'
+    prefix_options = ['0x']
+    hex_digits = '0123456789ABCDEF'
     while True:
         prefix = random.choice(prefix_options)
         hex_part = ''.join(random.choices(hex_digits, k=8))
