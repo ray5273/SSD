@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_3, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
@@ -88,7 +88,7 @@ def write_and_read_compare_in_range(data, start, end):
             return result
     return 'PASS'
 
-def full_write_and_read_compare(output='ssd_output.txt'):
+def full_write_and_read_compare():
     data = {}
     for idx, i in enumerate(range(0x00000001, 0x00000101), start=0):
         data[idx] = f"0x{i:08X}"
@@ -101,6 +101,22 @@ def full_write_and_read_compare(output='ssd_output.txt'):
 
     return "PASS"
 
+def write_read_aging():
+    """
+    Test script 3을 실행하고 결과를 출력합니다.
+    :return:
+        string: pass 혹은 fail 여부를 출력합니다.
+    """
+    for i in range(200):
+        target_data = hex_string_generator()
+        write(0,target_data)
+        write(99,target_data)
+        if read_compare(0,target_data) == "FAIL":
+            return "FAIL"
+        if read_compare(99,target_data) == "FAIL":
+            return "FAIL"
+    return "PASS"
+
 def help():
     current_dir = os.path.abspath(os.path.dirname(__file__))
     path = os.path.join(current_dir, "help.txt")
@@ -110,7 +126,6 @@ def help():
 
 
 def shell():
-    TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
     """무한 루프 쉘 모드"""
     print("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
     while True:
@@ -153,6 +168,8 @@ def shell():
                 fullread()
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
+            elif TEST_SCRIPT_3.startswith(command_param):
+                print(write_read_aging())
             elif command_param == "help":
                 help()
             else:

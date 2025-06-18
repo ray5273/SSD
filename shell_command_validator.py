@@ -1,7 +1,10 @@
+import random
 import re
 
 MAX_LBA = 100
 TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
+TEST_SCRIPT_3 = "3_WriteReadAging"
+
 
 def is_valid_read_command_params(user_input_list: list[str]) -> bool:
     # read param은 2개여야함. (커맨드 포함)
@@ -53,7 +56,9 @@ def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
 
 def is_valid_command(command_param):
     valid_command_list = ["write", "read", "fullwrite", "fullread", "help", "exit"]
-    if command_param!="" and TEST_SCRIPT_1.startswith(command_param):
+    if command_param != "" and TEST_SCRIPT_1.startswith(command_param):
+        return True
+    if command_param != "" and TEST_SCRIPT_3.startswith(command_param):
         return True
     if command_param in valid_command_list:
         return True
@@ -77,3 +82,19 @@ def is_valid_data(data):
     예: 0x1234ABCD (총 10글자)
     """
     return bool(re.fullmatch(r'0[xX][A-Fa-f0-9]{8}', str(data)))
+
+
+def hex_string_generator():
+    """
+    0x 또는 0X로 시작하고, 그 뒤에 8자리 A~F, 0~9로만 이루어진 16진수 문자열을 생성하는 제너레이터
+    예: 0x1234ABCD (총 10글자)
+    :return
+        candidate: 위 조건을 만족하는 string
+    """
+    prefix_options = ['0x', '0X']
+    hex_digits = '0123456789ABCDEFabcdef'
+    while True:
+        prefix = random.choice(prefix_options)
+        hex_part = ''.join(random.choices(hex_digits, k=8))
+        candidate = prefix + hex_part
+        return candidate

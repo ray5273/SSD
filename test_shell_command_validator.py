@@ -1,8 +1,9 @@
 from shell_command_validator import (
     is_valid_command, is_valid_lba, is_valid_data,
-    is_valid_read_command_params, is_valid_write_command_params, is_valid_fullwrite_command_params
+    is_valid_read_command_params, is_valid_write_command_params, is_valid_fullwrite_command_params,
+    hex_string_generator
 )
-
+import pytest
 MAX_LBA = 100
 
 
@@ -89,3 +90,10 @@ def test_is_valid_data():
     assert not is_valid_data("1234123412")
     assert not is_valid_data("0xGHIJ1234")
     assert not is_valid_data("0x")
+
+
+@pytest.mark.repeat(50)
+def test_hex_string_generator():
+    # 랜덤 hex string generator가 valid_data를 생성하는지를 테스트
+    data = hex_string_generator()
+    assert is_valid_data(data)

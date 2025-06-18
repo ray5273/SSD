@@ -170,3 +170,16 @@ def test_TestScript1(mocker):
 def test_TestScript1_with_shell_command():
     ...
 
+def test_write_read_aging_success(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="PASS")
+    assert shell.write_read_aging() == "PASS"
+
+def test_write_read_aging_failure(mocker):
+    # write는 아무 동작도 하지 않음
+    mocker.patch('shell.write')
+    # read_compare는 항상 "PASS" 반환
+    mocker.patch('shell.read_compare', return_value="FAIL")
+    assert shell.write_read_aging() == "FAIL"
