@@ -29,3 +29,14 @@
   fullread
 → SSD의 모든 LBA를 순서대로 읽어 화면에 출력합니다.
 
+📌 1_FullWriteAndReadCompare
+  “1_FullWriteAndReadCompare” 라고 입력한다.
+  “1_” 만 입력해도 실행 가능하다.
+
+📌 2_PartialLBAWrite
+  “2_PartialLBAWrite” 라고 입력한다.
+  “2_” 만 입력해도 실행 가능하다.
+
+ 📌 3_WriteReadAging
+  “3_WriteReadAging” 라고 입력한다.
+  “3_” 만 입력해도 실행 가능하다.
