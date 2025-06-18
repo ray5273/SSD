@@ -73,7 +73,7 @@ def test_write_with_invalid_data(mocker):
         mocker.patch('shell.call_system', return_value=0)
         shell.write(99, test_data)
         expected_calls = [
-            mocker.call('INVALID COMMAND')
+            mocker.call('INVALID COMMAND : DATA')
         ]
         mock_print.assert_has_calls(expected_calls)
 
@@ -83,6 +83,6 @@ def test_write_with_invalid_data(mocker):
         mocker.patch('shell.call_system', return_value=0)
         shell.write(99, test_data)
         expected_calls = [
-            mocker.call('INVALID COMMAND : DATA RANGE')
+            mocker.call('INVALID COMMAND : DATA')
         ]
         mock_print.assert_has_calls(expected_calls)

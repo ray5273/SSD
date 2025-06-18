@@ -16,6 +16,15 @@ def validate_lba(lba):
         return False
     return True
 
+def validate_data(data):
+    if len(data) > 10:
+        return False
+    try:
+        value = int(data)
+    except Exception:
+        return False
+    return True
+
 
 def write(lba, data, output='ssd_output.txt'):
     """write"""
@@ -23,13 +32,8 @@ def write(lba, data, output='ssd_output.txt'):
         print("INVALID COMMAND")
         return
 
-    if len(data) > 10:
-        print("INVALID COMMAND")
-        return
-    try:
-        value = int(data)
-    except Exception:
-        print("INVALID COMMAND : DATA RANGE")
+    if not validate_data(data):
+        print("INVALID COMMAND : DATA")
         return
 
     cmd = f'python ssd.py W {lba} {data}'
