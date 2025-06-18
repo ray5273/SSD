@@ -57,9 +57,10 @@ def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
 
 def is_valid_command(command_param):
     valid_command_list = ["write", "read", "fullwrite", "fullread", "help", "exit"]
-    if command_param != "" and TEST_SCRIPT_1.startswith(command_param) \
-            and TEST_SCRIPT_2.startswith(command_param) \
-            and TEST_SCRIPT_3.startswith(command_param):
+    if command_param != "" \
+        and (TEST_SCRIPT_1.startswith(command_param) \
+            or TEST_SCRIPT_2.startswith(command_param) \
+            or TEST_SCRIPT_3.startswith(command_param)):
         return True
     if command_param in valid_command_list:
         return True
