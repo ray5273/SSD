@@ -15,19 +15,22 @@ def test_call_system():
     cmd = f'dir'
     assert shell.call_system(cmd) == 0
 
-def test_read_result_file():
-    TEST_DATA = '0x99999999'
+def get_test_ssd_output_file(filename = "ssd_output.txt", data='0x99999999'):
     # 시스템 임시 디렉터리 경로
     tmp_dir = tempfile.gettempdir()
     # 내가 지정한 임시 파일명
-    filename = "ssd_output.txt"
+
     file_path = os.path.join(tmp_dir, filename)
     # 임시 파일 생성 및 쓰기
     with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(TEST_DATA)
+        f.write(data)
+    return file_path
 
-    assert shell.read_result_file(file_path) == TEST_DATA
+def test_read_result_file():
+    test_data = '0x99999999'
+    file_path = get_test_ssd_output_file(data=test_data)
+    assert shell.read_result_file(file_path) == test_data
 
 @pytest.mark.skip
-def test_read_with_valid_lba():
+def test_read_mock_with_valid_lba(mocker):
     ...
