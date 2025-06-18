@@ -124,6 +124,12 @@ def help():
     with open(path, encoding="utf-8") as f:
         print(f.read().strip())
 
+def read_compare(lba, value):
+    return True
+
+def partial_lba_write_2():
+    # write()
+    return True
 
 def shell():
     """무한 루프 쉘 모드"""
@@ -172,6 +178,8 @@ def shell():
                 print(write_read_aging())
             elif command_param == "help":
                 help()
+            elif user_input.startswith("2_"):
+                partial_lba_write()
             else:
                 print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
@@ -181,3 +189,4 @@ def shell():
 
 if __name__ == '__main__':
     shell()
+
