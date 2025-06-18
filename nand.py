@@ -17,10 +17,7 @@ class Nand:
             for i, line in enumerate(f, start=0):
                 if i == address:
                     value = line.strip()
-                    if value == self.default_value:
-                        raise Exception
-                    else:
-                        return value
+                    return value
         raise Exception
 
     def write(self, address, wdata):
