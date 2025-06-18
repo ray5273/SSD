@@ -16,7 +16,7 @@ def write(lba, data):
 
 def call_system(cmd:str):
     try:
-        result = subprocess.run("dir", shell=True, capture_output=True, text=True, encoding='cp949', check=True)  # or 'euc-kr'
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='UTF-8', check=True)  # or 'euc-kr'
     except Exception:
         #TODO : Exception에 대한 처리 없이 오류 발생한 returncode를 리턴하는 것으로 대체.
         ...
