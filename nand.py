@@ -15,14 +15,13 @@ class Nand:
     def read(self, address) -> str:
         with open(self.data_file, 'r', encoding='utf-8') as f:
             for i, line in enumerate(f, start=0):
-                print(i, line)
                 if i == address:
                     value = line.strip()
-                    if value == 0:
-                        return 'ERROR'
+                    if value == self.default_value:
+                        raise Exception
                     else:
                         return value
-        return 'ERROR'
+        raise Exception
 
     def write(self, address, value):
         pass
