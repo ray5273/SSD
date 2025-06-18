@@ -152,7 +152,7 @@ def shell():
             elif command_param == "fullread":
                 fullread()
             elif TEST_SCRIPT_1.startswith(command_param):
-                full_write_and_read_compare()
+                print(full_write_and_read_compare())
             elif command_param == "help":
                 help()
             else:
