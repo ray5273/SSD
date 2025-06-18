@@ -75,7 +75,7 @@ def fullread():
     except:
         print("fullread 에러 발생")
 
-def read_compare(lba, data):
+def read_compare(lba, data, filename='ssd_output.txt'):
     if read(lba) == data:
         return "PASS"
     return "FAIL"
@@ -135,10 +135,9 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
             write(lba, data, filename)
 
         for lba in [0,1,2,3,4]:
-            if not read_compare(lba, data):
-                print("FAIL")
-                return
-    print("PASS")
+            if read_compare(lba, data, filename) == "FAIL":
+                return "FAIL"
+    return "PASS"
 
 
 def shell():
@@ -185,7 +184,7 @@ def shell():
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
             elif TEST_SCRIPT_1.startswith("2_"):
-                partial_lba_write_2()
+                print(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
             elif command_param == "help":
