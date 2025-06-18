@@ -23,6 +23,15 @@ class Nand:
                         return value
         raise Exception
 
-    def write(self, address, value):
-        pass
+    def write(self, address, wdata):
+        with open(self.data_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        if address <= len(lines):
+            lines[address] = wdata+'\n'
+            with open(self.data_file, 'w', encoding='utf-8') as f:
+                f.writelines(lines)
+        else:
+            raise Exception
+        return
 
