@@ -36,10 +36,9 @@ def check_write_and_read(_ssd, addr, wdata):
 
 @pytest.fixture
 def clean_ssd():
-    nand = Nand(LBA_LENGTH, NAND_FILE)
     remove_files()
+    nand = Nand(LBA_LENGTH, NAND_FILE)
     SSD.LBA_LENGTH = LBA_LENGTH
-    SSD.NAND_FILE = NAND_FILE
     SSD.OUTPUT_FILE = OUTPUT_FILE
     return SSD(nand)
 
@@ -137,7 +136,7 @@ class TestSsd:
         """
         assert os.path.exists(OUTPUT_FILE)
 
-    @pytest.mark.skip
+    # @pytest.mark.skip
     def test_initial_nand_file(self, clean_ssd):
         """
         nand 파일 초기화가 잘 되었는지
