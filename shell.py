@@ -23,19 +23,18 @@ def call_system(cmd:str):
     return result.returncode
 
 
-def read_result_file(filename = 'ssd_output.txt'):
+def read_result_file(filename):
     line = None
     with open(filename, 'r' ) as f: #TODO encoding 확인 필요
         line = f.read()
     return line
 
-@cli.command(name="read")
-@click.argument('lba')
-def read(lba):
+def read(lba, filename = 'ssd_output.txt'):
     #TODO lba 범위 확인 & 에러 처리
+
     status = call_system(f'python ssd.py R {lba}')
     if status >= 0:
-        read_data = read_result_file()
+        read_data = read_result_file(filename)
         #TODO : lba 자릿수 고정.
         result_str = f'[READ] LBA {lba} : {read_data}'
         print(result_str)
