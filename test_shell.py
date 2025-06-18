@@ -1,27 +1,27 @@
-
 import os
+import random
+import tempfile
 from unittest.mock import patch
 
 import pytest
-import os
-import tempfile
-
-from shell import help, shell
 from pytest_mock import MockerFixture
 
 import shell
-import tempfile
+from shell import MAX_LBA
+
 
 def test_shell_read(mocker: MockerFixture):
     mocker.patch('shell.read', return_value='0x99999999')
     result = shell.read("3")
     assert result == "0x99999999"
 
+
 def test_call_system():
     cmd = f'dir'
     assert shell.call_system(cmd) == 0
 
-def get_test_ssd_output_file(filename = "ssd_output.txt", data='0x99999999'):
+
+def get_test_ssd_output_file(filename="ssd_output.txt", data='0x99999999'):
     # 시스템 임시 디렉터리 경로
     tmp_dir = tempfile.gettempdir()
     # 내가 지정한 임시 파일명
@@ -32,18 +32,20 @@ def get_test_ssd_output_file(filename = "ssd_output.txt", data='0x99999999'):
         f.write(data)
     return file_path
 
+
 def test_read_result_file():
     test_data = '0x99999999'
     file_path = get_test_ssd_output_file(data=test_data)
     assert shell.read_result_file(file_path) == test_data
 
+
 def test_read_mock_with_valid_lba(mocker):
-    mocker.patch('shell.call_system', return_value = 0)
-    #temp output 파일 생성.
+    mocker.patch('shell.call_system', return_value=0)
+    # temp output 파일 생성.
     test_data = '0x99ABCDEF'
     test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
-        shell.read(3, filename = test_filename)
+        shell.read(3, filename=test_filename)
         mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
 
 def test_write(mocker):
@@ -94,12 +96,12 @@ def test_write_with_invalid_data(mocker):
 
 def test_shell_help(capsys):
     inputs = [
-        "help",       # help() 호출
-        "exit"        # 종료
+        "help",  # help() 호출
+        "exit"  # 종료
     ]
 
     with patch("builtins.input", side_effect=inputs):
-        shell()
+        shell.shell()
 
     output = capsys.readouterr().out
 
@@ -109,3 +111,76 @@ def test_shell_help(capsys):
     assert "write" in output
     assert "fullread" in output
     assert "fullwrite" in output
+
+
+def test_fullwrite_success(mocker):
+    # Given : write() 함수를 mocking함.
+    # test_data에 data를 담아줌
+    mock_write = mocker.patch("shell.write")
+    test_data = "0xABCD"
+
+    # When : fullwrite(data)를 실행
+    shell.fullwrite(test_data)
+
+    # Then : MAX_LBA 만큼 write()가 실행되어야함.
+    assert mock_write.call_count == MAX_LBA
+
+    # Then : 각 호출의 파라미터 확인, lba와 test_data가 parameter로 잘 들어갔는지 확인
+    expected_lba = 0
+    for args_lba, call in enumerate(mock_write.call_args_list):
+        assert args_lba == expected_lba  # lba가 0~99 순서대로 들어가는지
+        assert call.args[1] == test_data  # data가 올바른지
+        expected_lba += 1
+
+
+@pytest.mark.repeat(100)
+def test_fullwrite_error_on_random_write(mocker):
+    # Given : fullwrite()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
+    error_lba = random.randint(0, MAX_LBA - 1)
+
+    def side_effect(lba, data):
+        if lba == error_lba:
+            raise RuntimeError("write error")
+
+    mock_print = mocker.patch("builtins.print")
+    mocker.patch("shell.write", side_effect=side_effect)
+
+    # When: fullwrite()를 실행하면
+    shell.fullwrite("0xABCD")
+
+    # Then: fullwrite 에러 발생 print가 확인되어야함.
+    mock_print.assert_any_call("fullwrite 에러 발생")
+
+
+def test_fullread_success(mocker):
+    # Given : read() 함수 동작을 mocking함.
+    mock_read = mocker.patch("shell.read")
+
+    # When : fullread()를 실행
+    shell.fullread()
+
+    # Then : MAX_LBA만큼 read()가 실행되어야함.
+    assert mock_read.call_count == MAX_LBA
+
+    # Then : 각 lba가 각 순서대로 호출이 되는지 확인
+    expected_lba = 0
+    for args_lba, call in enumerate(mock_read.call_args_list):
+        assert args_lba == expected_lba
+        expected_lba += 1
+
+
+@pytest.mark.repeat(100)
+def test_fullread_error_on_random_read(mocker):
+    # Given : fullread()의 내부 read() 실행의 랜덤 순서(0 ~ MAX_LBA - 1) 에서 RuntimeError를 발생시킴
+    error_lba = random.randint(0, MAX_LBA - 1)
+
+    def side_effect(lba):
+        if lba == error_lba:
+            raise RuntimeError("write error")
+
+    mocker.patch("shell.read", side_effect=side_effect)
+    mock_print = mocker.patch("builtins.print")
+    # When: fullread()를 실행하면
+    shell.fullread()
+    # Then: fullread 에러 발생 print가 확인되어야함.
+    mock_print.assert_any_call("fullread 에러 발생")
