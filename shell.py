@@ -31,13 +31,11 @@ def read_result_file(filename):
 
 def read(lba, filename = 'ssd_output.txt'):
     #TODO lba 범위 확인 & 에러 처리
-
     status = call_system(f'python ssd.py R {lba}')
     if status >= 0:
         read_data = read_result_file(filename)
-        #TODO : lba 자릿수 고정.
-        result_str = f'[READ] LBA {lba} : {read_data}'
-        print(result_str)
+        lba=int(lba)
+        print(f'[READ] LBA {lba:02d} : {read_data}')
 
 @cli.command(name="fullwrite")
 def fullwrite():

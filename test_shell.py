@@ -39,5 +39,5 @@ def test_read_mock_with_valid_lba(mocker):
     test_data = '0x99ABCDEF'
     test_filename = get_test_ssd_output_file(data=test_data)
     with patch('builtins.print') as mock_print:
-        shell.read('3', filename = test_filename)
-        mock_print.assert_called_once_with("[READ] LBA 3 : 0x99ABCDEF")
+        shell.read(3, filename = test_filename)
+        mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
