@@ -1,6 +1,7 @@
 from file_output import FileOutput
 from lba_validator import LBAValidator
-
+from nand import Nand
+import sys
 
 class SSD:
     LBA_LENGTH = 100
@@ -40,3 +41,14 @@ class SSD:
             self.result = self.ERROR_MSG
             return False
         return True
+
+
+FILE_PATH = "ssd_nand.txt"
+LBA_LENGTH = 100
+
+if __name__ == "__main__":
+
+    nand = Nand(LBA_LENGTH, FILE_PATH)
+    ssd = SSD(nand)
+
+    ssd.run(sys.argv[1:])
