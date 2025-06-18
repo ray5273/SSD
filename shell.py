@@ -1,4 +1,6 @@
 import click
+import os
+import subprocess
 
 @click.group()
 def cli():
@@ -12,10 +14,28 @@ def write(lba, data):
     """write"""
     pass
 
+def call_system(cmd:str):
+    try:
+        result = subprocess.run("dir", shell=True, capture_output=True, text=True, encoding='cp949', check=True)  # or 'euc-kr'
+    except Exception:
+        #TODO : Exception에 대한 처리 없이 오류 발생한 returncode를 리턴하는 것으로 대체.
+        ...
+    return result.returncode
+
+
+def read_result_file():
+    pass
+
 @cli.command(name="read")
 @click.argument('lba')
 def read(lba):
-    pass
+    #TODO lba 범위 확인 & 에러 처리
+    status = call_system(f'python ssd.py R {lba}')
+    if status >= 0:
+        read_data = read_result_file()
+        #TODO : lba 자릿수 고정.
+        result_str = f'[READ] LBA {lba} : {read_data}'
+        print(result_str)
 
 @cli.command(name="fullwrite")
 def fullwrite():
