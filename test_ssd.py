@@ -50,13 +50,27 @@ def ssd_and_device(mocker):
     return (ssd, device)
 
 class TestSsdWithMock:
+    def test_read_command(self, ssd_and_device):
+        """ read command 수행 시 device의 read 호출 되는지 """
+        ssd, device = ssd_and_device
+        ssd.run([READ_COMMAND, FIRST_ADDRESS])
+        device.read.assert_called_with(FIRST_ADDRESS)
+
+    def test_write_command(self, ssd_and_device):
+        """ write comand 수행 시 device의 write 호출 되는지 """
+        ssd, device = ssd_and_device
+        ssd.run([WRITE_COMMAND, FIRST_ADDRESS, DEFAULT_DATA])
+        device.write.assert_called_with(FIRST_ADDRESS, DEFAULT_DATA)
+
     def test_uninitialized_data(self, ssd_and_device):
+        """ read 하여 default 값 읽히는지"""
         ssd, device = ssd_and_device
         device.read.return_value = DEFAULT_DATA
         ssd.run([READ_COMMAND, FIRST_ADDRESS])
         assert ssd.result == DEFAULT_DATA
 
     def test_write_data(self, ssd_and_device):
+        """ write 한 data가 올바르게 읽히는지 """
         ssd, device = ssd_and_device
         addr = FIRST_ADDRESS
         data = "0x1234abcd"
@@ -66,6 +80,7 @@ class TestSsdWithMock:
         assert ssd.result == data
 
     def test_read_out_of_bounds(self, ssd_and_device):
+        """ addr 범위 밖 read 하는 경우 -> ERROR """
         ssd, device = ssd_and_device
         addr = "9999999"
         device.read.side_effect = Exception()
@@ -73,6 +88,7 @@ class TestSsdWithMock:
         assert ssd.result == "ERROR"
 
     def test_write_out_of_bounds(self, ssd_and_device):
+        """ addr 범위 밖 write 하는 경우 -> ERROR """
         ssd, device = ssd_and_device
         addr = "1000000"
         device.write.side_effect = Exception()
@@ -80,21 +96,25 @@ class TestSsdWithMock:
         assert ssd.result == "ERROR"
 
     def test_invalid_command(self, ssd_and_device):
+        """ 정의되지 않은 command가 들어오는 경우 -> ERROR"""
         ssd, device = ssd_and_device
         ssd.run(["UNKNOWN_COMMAND", FIRST_ADDRESS])
         assert ssd.result == "ERROR"
 
     def test_invalid_read_address(self, ssd_and_device):
+        """ address 형식이 올바르지 않은 경우 read  -> ERROR """
         ssd, device = ssd_and_device
         ssd.run([READ_COMMAND, "address"])
         assert ssd.result == "ERROR"
 
     def test_invalid_write_address(self, ssd_and_device):
+        """ address 형식이 올바르지 않은 경우 write -> ERROR"""
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, "address"])
         assert ssd.result == "ERROR"
 
     def test_invalid_write_data(self, ssd_and_device):
+        """ write data 형식이 hex가 아닐 때 -> ERROR """
         ssd, device = ssd_and_device
         ssd.run([WRITE_COMMAND, FIRST_ADDRESS, "invalid_data"])
         assert ssd.result == "ERROR"
@@ -174,7 +194,7 @@ class TestSsd:
 
     @pytest.mark.skip
     def test_out_of_lba_range_read(self, clean_ssd):
-        clean_ssd.run([READ_COMMAND, "99999999"])
+        clean_ssd.run([READ_COMMAND, f"{LBA_LENGTH}"])
         assert_output_file(ERROR_MESSAGE)
 
     @pytest.mark.skip
