@@ -11,6 +11,16 @@ class SSD:
         self._last_result = None
         self._param_validator = LBAValidator(self.LBA_LENGTH)
 
+    @property
+    def result(self):
+        return self._last_result
+
+    @result.setter
+    def result(self, value):
+        self._out_writer.write(value)
+        self._last_result = value
+
+
     def run(self, params: list) -> bool:
         if not self._param_validator.is_valid(params):
             return False
