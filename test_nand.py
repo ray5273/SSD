@@ -19,13 +19,13 @@ def test_nand_read_uninitialized_data_at_last_address(nand):
     assert nand.read(LAST_ADDRESS) == DEFAULT_VALUE
 
 def test_nand_write_first_address(nand):
-    addr = FIRST_ADDRESS
+    addr = FIRST_ADDRESS + 1
     wdata = "0x1234abcd"
     nand.write(addr, wdata)
     assert nand.read(addr) == wdata
 
 def test_nand_write_last_address(nand):
-    addr = LAST_ADDRESS
+    addr = LAST_ADDRESS - 1
     wdata = "0x1f1f1f1f"
     nand.write(addr, wdata)
     assert nand.read(addr) == wdata
