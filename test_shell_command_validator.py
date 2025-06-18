@@ -54,6 +54,12 @@ def test_is_valid_command():
     assert is_valid_command("write")
     assert is_valid_command("read")
 
+    # 유효한 스크립트
+    assert is_valid_command("1")
+    assert is_valid_command("1_")
+    assert is_valid_command("1_FullWriteAndR")
+    assert is_valid_command("1_FullWriteAndReadCompare")
+
     # 유효하지 않은 커맨드들
     assert not is_valid_command("unknown")
     assert not is_valid_command("")

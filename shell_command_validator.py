@@ -1,7 +1,7 @@
 import re
 
 MAX_LBA = 100
-
+TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
 
 def is_valid_read_command_params(user_input_list: list[str]) -> bool:
     # read param은 2개여야함. (커맨드 포함)
@@ -53,6 +53,8 @@ def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
 
 def is_valid_command(command_param):
     valid_command_list = ["write", "read", "fullwrite", "fullread", "help", "exit"]
+    if command_param!="" and TEST_SCRIPT_1.startswith(command_param):
+        return True
     if command_param in valid_command_list:
         return True
     return False
