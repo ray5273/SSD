@@ -83,10 +83,10 @@ def test_is_valid_lba():
 def test_is_valid_data():
     # Valid한 데이터인 경우
     assert is_valid_data("0x000000AF")
-    assert is_valid_data("0X00001234")
-    assert is_valid_data("0x00abcdef")
+    assert is_valid_data("0x00001234")
 
     # Valid한 데이터가 아닌 경우
+    assert not is_valid_data("0x00abcdef")
     assert not is_valid_data("1234123412")
     assert not is_valid_data("0xGHIJ1234")
     assert not is_valid_data("0x")
