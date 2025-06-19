@@ -34,6 +34,7 @@ class TestSsdEraseWithMock:
         ssd.run([ERASE_COMMAND, "-1", "2"])
         assert ssd.result == ERROR_MESSAGE
 
+
 class TestSsdEraseWithFake:
     def test_erase_1(self, fake_ssd_and_device):
         ssd, device = fake_ssd_and_device

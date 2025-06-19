@@ -5,6 +5,7 @@ MAX_LBA = 100
 TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
 TEST_SCRIPT_2 = "2_PartialLBAWrite"
 TEST_SCRIPT_3 = "3_WriteReadAging"
+TEST_SCRIPT_4 = "4_EraseAndWriteAging"
 
 
 def is_valid_read_command_params(user_input_list: list[str]) -> bool:
@@ -54,13 +55,57 @@ def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
 
     return True
 
+def is_integer_or_negative(s: str) -> bool:
+    if s.startswith('-') and s[1:].isdigit() :
+        return True  # 음수: 앞에 '-' 제외하고 숫자인지 확인
+    if s.isdigit() :
+        return True
+    return False
+
+def is_valid_erase_command_params(user_input_list: list) -> bool:
+    if len(user_input_list) != 3:
+        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        return False
+
+    # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
+    lba_str = user_input_list[1]
+    if not is_valid_lba(lba_str):
+        print("lba가 valid 하지 않습니다.")
+        return False
+
+    # 3번째 param은 숫자여야 하고, 범위가 -INF ~ +INF
+    size_str = user_input_list[2]
+
+    if not is_integer_or_negative(size_str):
+        return False
+    return True
+
+def is_valid_erase_range_params(user_input_list: list) -> bool:
+    if len(user_input_list) != 3:
+        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        return False
+
+    # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
+    lba_start_str = user_input_list[1]
+    if not is_valid_lba(lba_start_str):
+        print("start lba가 valid 하지 않습니다.")
+        return False
+
+    # 3번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
+    lba_start_str = user_input_list[2]
+    if not is_valid_lba(lba_start_str):
+        print("end lba가 valid 하지 않습니다.")
+        return False
+
+    return True
 
 def is_valid_command(command_param):
-    valid_command_list = ["write", "read", "fullwrite", "fullread", "help", "exit"]
+    valid_command_list = ["write", "read", "erase", "erase_range", "fullwrite", "fullread", "help", "exit"]
     if command_param != "" \
         and (TEST_SCRIPT_1.startswith(command_param) \
             or TEST_SCRIPT_2.startswith(command_param) \
-            or TEST_SCRIPT_3.startswith(command_param)):
+            or TEST_SCRIPT_3.startswith(command_param) \
+            or TEST_SCRIPT_4.startswith(command_param)):
         return True
     if command_param in valid_command_list:
         return True
