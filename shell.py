@@ -3,6 +3,7 @@ import sys
 import click
 import os
 import subprocess
+from logger import LOGGER
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, is_valid_erase_command_params, \
     is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, TEST_SCRIPT_4, hex_string_generator
@@ -20,9 +21,9 @@ def write(lba, data, output='ssd_output.txt'):
         # 잘 써졌는지 결과 확인, SSD에서 write 에러 발생 시에 파일에 ERROR 출력.
         result = read(lba, output)
         if result == "ERROR":
-            print(f'[WRITE] Fail')
+            LOGGER.print_log(f'[WRITE] Fail')
         else:
-            print(f'[WRITE] Done')
+            LOGGER.print_log(f'[WRITE] Done')
         return result
     return "INVALID COMMAND : WRITE"
 
@@ -33,7 +34,7 @@ def call_system(cmd: str):
                                 check=True)  # or 'euc-kr'
         return result.returncode
     except Exception as e:
-        print(f"ssd.py를 호출했으나 오류 발생했습니다 : {e}")
+        LOGGER.print_log(f"ssd.py를 호출했으나 오류 발생했습니다 : {e}")
         return -1
 
 
@@ -50,7 +51,7 @@ def read(lba, filename='ssd_output.txt'):
     if status >= 0:
         read_data = read_result_file(filename)
         lba=int(lba)
-        print(f'[READ] LBA {lba:02d} : {read_data}')
+        LOGGER.print_log(f'[READ] LBA {lba:02d} : {read_data}')
     return read_data
 
 
@@ -66,7 +67,7 @@ def fullwrite(data):
         for lba in range(MAX_LBA):
             write(lba, data)
     except:
-        print("fullwrite 에러 발생")
+        LOGGER.print_log("fullwrite 에러 발생")
 
 
 def fullread():
@@ -78,7 +79,7 @@ def fullread():
         for lba in range(MAX_LBA):
             read(lba)
     except:
-        print("fullread 에러 발생")
+        LOGGER.print_log("fullread 에러 발생")
 
 def erase(lba:int, size:int):
     """
@@ -114,11 +115,11 @@ def erase(lba:int, size:int):
 
         if status >= 0:
             # Todo debugging
-            print(f"[ERASE] E {actual_lba:02} {chunk_size}")
+            LOGGER.print_log(f"[ERASE] E {actual_lba:02} {chunk_size}")
             current_lba += chunk_size * direction
             remaining -= chunk_size
         else:
-            print("Erase 에러 발생")
+            LOGGER.print_log("Erase 에러 발생")
             return
 
 
@@ -152,11 +153,11 @@ def erase_range(lba_start: int, lba_end: int):
 
         if status >= 0:
             # Todo debugging
-            print(f"[ERASE] E {current_lba:02} {chunk_size}")
+            LOGGER.print_log(f"[ERASE] E {current_lba:02} {chunk_size}")
             current_lba += chunk_size
             remaining -= chunk_size
         else:
-            print("Erase 에러 발생")
+            LOGGER.print_log("Erase 에러 발생")
             return
 
 
@@ -209,7 +210,7 @@ def help():
     path = os.path.join(current_dir, "help.txt")
 
     with open(path, encoding="utf-8") as f:
-        print(f.read().strip())
+        LOGGER.print_log(f.read().strip())
 
 
 def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
@@ -257,40 +258,40 @@ def erase_and_writing_aging():
 
 def shell():
     """무한 루프 쉘 모드"""
-    print("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
+    LOGGER.print_log("📥 Shell 모드 진입. 'exit' 입력 시 종료됩니다.")
     while True:
         try:
             user_input_list = input("Shell > ").strip().split()
 
             if len(user_input_list) < 1:
-                print("유저가 아무 커맨드도 입력 하지 않았습니다.")
+                LOGGER.print_log("유저가 아무 커맨드도 입력 하지 않았습니다.")
                 continue
 
             command_index, param1_index, param2_index = 0, 1, 2
             command_param = user_input_list[command_index]
             if not is_valid_command(command_param):
-                print("INVALID COMMAND")
+                LOGGER.print_log("INVALID COMMAND")
                 continue
 
             if command_param in ('exit'):
-                print("👋 종료합니다.")
+                LOGGER.print_log("👋 종료합니다.")
                 break
             elif command_param == "write":
                 # 인자 check 및 에러 처리 필요
                 if not is_valid_write_command_params(user_input_list=user_input_list):
-                    print("write command parameter가 포맷에 맞지 않습니다.")
+                    LOGGER.print_log("write command parameter가 포맷에 맞지 않습니다.")
                     continue
                 lba_str, data_str = user_input_list[param1_index], user_input_list[param2_index]
                 write(lba=lba_str, data=data_str)
             elif command_param == "read":
                 if not is_valid_read_command_params(user_input_list=user_input_list):
-                    print("read command parameter가 포맷에 맞지 않습니다.")
+                    LOGGER.print_log("read command parameter가 포맷에 맞지 않습니다.")
                     continue
                 lba_str = user_input_list[param1_index]
                 read(lba=lba_str)
             elif command_param == "fullwrite":
                 if not is_valid_fullwrite_command_params(user_input_list=user_input_list):
-                    print("fullwrite command parameter가 포맷에 맞지 않습니다.")
+                    LOGGER.print_log("fullwrite command parameter가 포맷에 맞지 않습니다.")
                     continue
                 data_str = user_input_list[param1_index]
                 fullwrite(data=data_str)
@@ -298,30 +299,30 @@ def shell():
                 fullread()
             elif command_param == "erase":
                 if not is_valid_erase_command_params(user_input_list=user_input_list):
-                    print("erase command parameter가 포맷에 맞지 않습니다.")
+                    LOGGER.print_log("erase command parameter가 포맷에 맞지 않습니다.")
                     continue
                 lba_str, size_str =  user_input_list[param1_index], user_input_list[param2_index]
                 erase(lba=int(lba_str), size=int(size_str))
             elif command_param == "erase_range":
                 if not is_valid_erase_command_params(user_input_list=user_input_list):
-                    print("erase range command parameter가 맞지 않습니다.")
+                    LOGGER.print_log("erase range command parameter가 맞지 않습니다.")
                     continue
                 lba_start_str, lba_end_str =  user_input_list[param1_index], user_input_list[param2_index]
                 erase_range(lba_start=int(lba_start_str), lba_end=int(lba_end_str))
             elif TEST_SCRIPT_1.startswith(command_param):
-                print(full_write_and_read_compare())
+                LOGGER.print_log(full_write_and_read_compare())
             elif TEST_SCRIPT_2.startswith(command_param):
-                print(partial_lba_write_2())
+                LOGGER.print_log(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
-                print(write_read_aging())
+                LOGGER.print_log(write_read_aging())
             elif TEST_SCRIPT_4.startswith(command_param):
-                print(erase_and_writing_aging())
+                LOGGER.print_log(erase_and_writing_aging())
             elif command_param == "help":
                 help()
             else:
-                print("❓ 알 수 없는 명령입니다.")
+                LOGGER.print_log("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
-            print("\n👋 종료합니다.")
+            LOGGER.print_log("\n👋 종료합니다.")
             break
 
 def is_runner_script_file(filename):

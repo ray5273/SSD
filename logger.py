@@ -1,22 +1,25 @@
 import datetime
-import os
 import inspect
-import sys
+import os
 
-LATEST_FILE = "latest.log"
 
 class Logger:
-    def __init__(self, is_stdout:bool, file_path:str, max_bytes:int, test_mode=False):
+    def __init__(self, is_stdout: bool, file_path: str, max_bytes: int, test_mode=False):
         self.is_stdout = is_stdout
         self.file_path = file_path
         self.max_bytes = max_bytes
         self.test_mode = test_mode
 
+    def update_settings(self, is_stdout: bool, file_path: str, max_bytes: int):
+        self.is_stdout = is_stdout
+        self.file_path = file_path
+        self.max_bytes = max_bytes
+
     # runner의 출력은 stdout에만 찍히면 되므로 이 메세지를 통해서 출력을함.
-    def print_always(self, message:str):
+    def print_always(self, message: str):
         print(message)
 
-    def print_log(self, message:str):
+    def print_log(self, message: str):
         """
         로그 메시지 출력 함수
         - stdout과 파일 모두 출력 또는 파일만 출력
@@ -28,31 +31,31 @@ class Logger:
         if frame:
             caller_class = "UnknownClass"
             caller_func = frame.f_code.co_name
-            
+
             # 클래스 이름 찾기
             if 'self' in frame.f_locals:
                 caller_class = frame.f_locals['self'].__class__.__name__
             elif 'cls' in frame.f_locals:
                 caller_class = frame.f_locals['cls'].__name__
-                
+
             caller_info = f"{caller_class}.{caller_func}()"
         else:
             caller_info = "Unknown.Unknown()"
-            
+
         # 날짜시간 포맷 -> e.g. [26.01.01 17:04]
         now = datetime.datetime.now()
         timestamp = now.strftime("[%y.%m.%d %H:%M]")
-        
+
         # 클래스명.함수명 부분 30자리로 패딩
         padded_caller = f"{caller_info:<30}"
-        
+
         # 최종 로그 메시지 생성
         log_line = f"{timestamp} {padded_caller} : {message}"
-        
+
         # stdout 출력
         if self.is_stdout:
             print(log_line)
-            
+
         # 파일 MAX 크기 넘어갔을때 처리 및 until_{}.log 파일이 2개이상일때 처리
         if self.file_path:
             file_size = self.get_file_size()
@@ -85,6 +88,8 @@ class Logger:
         # 파일에 로그 쓰기 : 마지막에 해야 latest가 남음
         with open(self.file_path, 'a', encoding='utf-8') as f:
             f.write(log_line + '\n')
+            f.flush()
+            os.fsync(f.fileno())
 
     def rename_when_two_log_exists(self, until_logs):
         # 파일 이름에 생성 시간이 있으므로 파일 이름을 기준으로 정렬
@@ -109,3 +114,9 @@ class Logger:
         if os.path.exists(self.file_path):
             file_size = os.path.getsize(self.file_path)
         return file_size
+
+
+# 싱글톤 구현
+LATEST_FILE = "latest.log"
+# 10KB, latest.log에 파일쓰기, stdout은 True가 Default
+LOGGER = Logger(is_stdout=True, file_path=LATEST_FILE, max_bytes=10240, test_mode=False)

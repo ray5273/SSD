@@ -1,5 +1,6 @@
 import random
 import re
+from logger import LOGGER
 
 MAX_LBA = 100
 TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
@@ -11,12 +12,12 @@ TEST_SCRIPT_4 = "4_EraseAndWriteAging"
 def is_valid_read_command_params(user_input_list: list[str]) -> bool:
     # read param은 2개여야함. (커맨드 포함)
     if len(user_input_list) != 2:
-        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        LOGGER.print_log(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
         return False
     # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
     lba_str = user_input_list[1]
     if not is_valid_lba(lba_str):
-        print("lba가 valid 하지 않습니다.")
+        LOGGER.print_log("lba가 valid 하지 않습니다.")
         return False
     return True
 
@@ -24,19 +25,19 @@ def is_valid_read_command_params(user_input_list: list[str]) -> bool:
 def is_valid_write_command_params(user_input_list: list[str]) -> bool:
     # write param은 3개여야함. (커맨드 포함)
     if len(user_input_list) != 3:
-        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        LOGGER.print_log(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
         return False
 
     # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
     lba_str = user_input_list[1]
     if not is_valid_lba(lba_str):
-        print("lba가 valid 하지 않습니다.")
+        LOGGER.print_log("lba가 valid 하지 않습니다.")
         return False
 
     # 3번째 param은 0x00000000 ~ 0xFFFFFFFF 형태여야함.
     data_str = user_input_list[2]
     if not is_valid_data(data_str):
-        print("data가 valid 하지 않습니다.")
+        LOGGER.print_log("data가 valid 하지 않습니다.")
         return False
     return True
 
@@ -44,13 +45,13 @@ def is_valid_write_command_params(user_input_list: list[str]) -> bool:
 def is_valid_fullwrite_command_params(user_input_list: list[str]) -> bool:
     # fullwrite param은 2개여야함. (커맨드 포함)
     if len(user_input_list) != 2:
-        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        LOGGER.print_log(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
         return False
 
     # 2번째 param은 0x00000000 ~ 0xFFFFFFFF 사이여야합니다.
     data_str = user_input_list[1]
     if not is_valid_data(data_str):
-        print("data가 valid 하지 않습니다")
+        LOGGER.print_log("data가 valid 하지 않습니다")
         return False
 
     return True
@@ -64,13 +65,13 @@ def is_integer_or_negative(s: str) -> bool:
 
 def is_valid_erase_command_params(user_input_list: list) -> bool:
     if len(user_input_list) != 3:
-        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        LOGGER.print_log(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
         return False
 
     # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
     lba_str = user_input_list[1]
     if not is_valid_lba(lba_str):
-        print("lba가 valid 하지 않습니다.")
+        LOGGER.print_log("lba가 valid 하지 않습니다.")
         return False
 
     # 3번째 param은 숫자여야 하고, 범위가 -INF ~ +INF
@@ -82,19 +83,19 @@ def is_valid_erase_command_params(user_input_list: list) -> bool:
 
 def is_valid_erase_range_params(user_input_list: list) -> bool:
     if len(user_input_list) != 3:
-        print(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
+        LOGGER.print_log(f"파라미터 갯수가 올바르지 않습니다: {len(user_input_list)}")
         return False
 
     # 2번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
     lba_start_str = user_input_list[1]
     if not is_valid_lba(lba_start_str):
-        print("start lba가 valid 하지 않습니다.")
+        LOGGER.print_log("start lba가 valid 하지 않습니다.")
         return False
 
     # 3번째 param은 숫자여야하고, 범위가 MAX_LBA 미만이어야함.
     lba_start_str = user_input_list[2]
     if not is_valid_lba(lba_start_str):
-        print("end lba가 valid 하지 않습니다.")
+        LOGGER.print_log("end lba가 valid 하지 않습니다.")
         return False
 
     return True
