@@ -2,11 +2,12 @@ import click
 import os
 import subprocess
 
-from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3,TEST_SCRIPT_4, hex_string_generator
+from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, is_valid_erase_command_params, \
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, TEST_SCRIPT_4, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
+MIN_LBA = 0
 INITIAL_VALUE = '0x00000000'
 
 def write(lba, data, output='ssd_output.txt'):
@@ -76,6 +77,91 @@ def fullread():
             read(lba)
     except:
         print("fullread 에러 발생")
+
+def erase(lba:int, size:int):
+    """
+    SSD erase 요청을 내부적으로 10단위로 나누어 처리합니다.
+    size가 음수이면 역방향으로 처리하되, 실제 E 명령에 들어가는 size는 항상 양수입니다.
+    유효한 LBA 범위는 0~99로 제한됩니다.
+    """
+
+    try:
+        direction = 1 if size > 0 else -1
+        remaining = abs(size)
+        current_lba = lba
+        step = 10
+
+        while remaining > 0:
+            chunk_size = min(step, remaining)
+
+            if direction > 0:
+                actual_lba = current_lba
+                upper_bound = actual_lba + chunk_size - 1
+                if upper_bound >= MAX_LBA:
+                    chunk_size = max(0, MAX_LBA - actual_lba)
+            else:
+                actual_lba = current_lba - chunk_size + 1
+                if actual_lba < MIN_LBA:
+                    chunk_size = max(0, current_lba - MIN_LBA + 1)
+                    actual_lba = MIN_LBA
+
+            if chunk_size <= 0:
+                break
+
+            status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
+
+            if status >= 0:
+                print(f"[ERASE] E {actual_lba:02} {chunk_size}")
+                current_lba += chunk_size * direction
+                remaining -= chunk_size
+            else:
+                print("Erase 에러 발생")
+                return
+        # fullread()
+    except:
+        print("erase 에러 발생")
+
+
+def erase_range(lba_start: int, lba_end: int):
+    """
+    SSD erase 요청을 Start LBA ~ End LBA 범위에 대해 10 단위로 수행합니다.
+    E 명령의 size는 항상 양수입니다.
+    유효한 LBA 범위는 0 ~ 99 입니다.
+    Start LBA > End LBA인 경우 자동으로 보정합니다.
+    """
+
+    try:
+        # start > end 이면 교환
+        if lba_start > lba_end:
+            lba_start, lba_end = lba_end, lba_start
+
+        # LBA 범위 보정
+        if lba_start < MIN_LBA:
+            lba_start = MIN_LBA
+        if lba_end >= MAX_LBA:
+            lba_end = MAX_LBA - 1
+
+        current_lba = lba_start
+        total_size = lba_end - lba_start + 1
+        remaining = total_size
+        step = 10
+
+        while remaining > 0:
+            chunk_size = min(step, remaining)
+
+            status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
+
+            if status >= 0:
+                print(f"[ERASE] E {current_lba:02} {chunk_size}")
+                current_lba += chunk_size
+                remaining -= chunk_size
+            else:
+                print("Erase 에러 발생")
+                return
+
+    except:
+        print("erase_range 에러 발생")
+
 
 def read_compare(lba, data, filename='ssd_output.txt'):
     if read(lba) == data:
@@ -216,6 +302,18 @@ def shell():
                 fullwrite(data=data_str)
             elif command_param == "fullread":
                 fullread()
+            elif command_param == "erase":
+                if not is_valid_erase_command_params(user_input_list=user_input_list):
+                    print("erase command parameter가 포맷에 맞지 않습니다.")
+                    continue
+                lba_str, size_str =  user_input_list[param1_index], user_input_list[param2_index]
+                erase(lba=int(lba_str), size=int(size_str))
+            elif command_param == "erase_range":
+                if not is_valid_erase_range_params(user_input_list=user_input_list):
+                    print("erase range command parameter가 맞지 않습니다.")
+                    continue
+                lba_start_str, lba_end_str =  user_input_list[param1_index], user_input_list[param2_index]
+                erase_range(lba_start=int(lba_start_str), lba_end=int(lba_end_str))
             elif TEST_SCRIPT_1.startswith(command_param):
                 print(full_write_and_read_compare())
             elif TEST_SCRIPT_2.startswith(command_param):
