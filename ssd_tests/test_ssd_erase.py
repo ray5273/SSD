@@ -13,7 +13,7 @@ class TestSsdEraseWithMock:
         ssd.run([ERASE_COMMAND, addr, size])
         device.erase.assert_called_with(int(addr), int(1))
 
-    def test_erase_0(self, ssd_and_device):
+    def test_erase_when_size_is_0(self, ssd_and_device):
         ssd, device = ssd_and_device
         erase_data(ssd, FIRST_ADDRESS, "0")
         device.erase.assert_not_called()
@@ -62,7 +62,7 @@ class TestSsdErase:
         erase_data(ssd, FIRST_ADDRESS, "1")
         assert read_nand_data(ssd, FIRST_ADDRESS) == DEFAULT_DATA
 
-    def test_erase_10(self, ssd):
+    def test_erase_when_size_is_10(self, ssd):
         start_address = "20"
         size = 10
         data_list = [ f"0x0000000{x}" for x in range(size)]
