@@ -53,7 +53,6 @@ class TestSsdEraseWithFake:
         for rdata in read_incr(ssd, FIRST_ADDRESS, size):
             assert rdata == DEFAULT_DATA
 
-
 class TestSsdErase:
     def test_erase_1(self, ssd):
         addr = FIRST_ADDRESS
@@ -63,11 +62,16 @@ class TestSsdErase:
         assert read_nand_data(ssd, FIRST_ADDRESS) == DEFAULT_DATA
 
     def test_erase_10(self, ssd):
-        for i in range(10):
-            addr = f"{i}"
-            wdata = f"0x0000000{i}"
-            write_data(ssd, addr, wdata)
-        erase_data(ssd, FIRST_ADDRESS, "10")
-        for i in range(10):
-            addr = f"{i}"
-            assert read_nand_data(ssd, addr) == DEFAULT_DATA
+        start_address = "20"
+        size = 10
+        data_list = [ f"0x0000000{x}" for x in range(size)]
+        # write
+        write_incr(ssd, start_address, data_list)
+        # read compare
+        for wdata, rdata in zip(data_list, read_incr(ssd, start_address, size)):
+            assert rdata == wdata
+
+        # erase
+        erase_data(ssd, start_address, size)
+        for rdata in read_incr(ssd, start_address, size):
+            assert rdata == DEFAULT_DATA
