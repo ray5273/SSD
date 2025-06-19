@@ -1,10 +1,10 @@
 import sys
 
-from command import Command
-from erase_command import EraseSSDCommand
-from read_command import ReadSSDCommand
-from unknown_command import UnknownSSDCommand
-from write_command import WriteSSDCommand
+from commands.command import Command
+from commands.erase_command import EraseSSDCommand
+from commands.read_command import ReadSSDCommand
+from commands.unknown_command import UnknownSSDCommand
+from commands.write_command import WriteSSDCommand
 
 from file_output import FileOutput
 from nand import Nand
