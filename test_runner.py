@@ -19,6 +19,34 @@ def get_test_batch_script():
         f.write("\n".join(commands ) )
     return fullname
 
+def get_test_batch_script_with_1_3():
+    commands = [
+        '1_FullWriteAndReadCompare',
+        '2_PartialLBAWrite',
+        '3_WriteReadAging',
+        # '4_EraseAndWriteAging',
+    ]
+    temp_path = tempfile.gettempdir()
+    temp_script = 'shell_script.txt'
+    fullname = os.path.join(temp_path, temp_script)
+    with open(fullname, 'w', encoding='utf-8') as f:
+        f.write("\n".join(commands ) )
+    return fullname
+
+def get_test_batch_script_with_1():
+    commands = [
+        '1_FullWriteAndReadCompare',
+        # '2_PartialLBAWrite',
+        # '3_WriteReadAging',
+        # '4_EraseAndWriteAging',
+    ]
+    temp_path = tempfile.gettempdir()
+    temp_script = 'shell_script.txt'
+    fullname = os.path.join(temp_path, temp_script)
+    with open(fullname, 'w', encoding='utf-8') as f:
+        f.write("\n".join(commands ) )
+    return fullname
+
 def remove_test_batch_script(filename):
     if os.path.exists(filename):
         try:
@@ -86,4 +114,10 @@ def test_run_batch_script():
     runner = Runner(get_test_batch_script())
     assert runner.run() == "PASS"
 
+def test_run_batch_script():
+    assert shell.run_batch_script(get_test_batch_script_with_1_3()) == "PASS"
+
+def test_call_in_cli():
+    assert os.system('python shell.py test.txt') < 0
+    assert os.system(f'python shell.py {get_test_batch_script_with_1()}') == 0
 

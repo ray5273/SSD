@@ -1,3 +1,5 @@
+import sys
+
 import click
 import os
 import subprocess
@@ -317,11 +319,7 @@ def shell():
             elif command_param == "help":
                 help()
             else:
-                if is_runner_script_file(command_param):
-                    runner = Runner(command_param)
-                    runner.run()
-                else:
-                    print("❓ 알 수 없는 명령입니다.")
+                print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
             print("\n👋 종료합니다.")
             break
@@ -372,8 +370,18 @@ class Runner():
         return result
 
 
-
-
+def run_batch_script(script_name):
+    if is_runner_script_file(script_name):
+        runner = Runner(script_name)
+        return runner.run()
+    else:
+        print(f"INVALID COMMAND : BATCH SCRIPT IS NOT EXIST : {script_name}")
+        return "FAIL"
 
 if __name__ == '__main__':
-    shell()
+    command = sys.argv[0]
+    if len(sys.argv) == 2:
+        if "PASS" != run_batch_script(sys.argv[1]):
+            sys.exit(-1)
+    else:
+        shell()
