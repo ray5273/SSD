@@ -43,8 +43,8 @@ class BufferDriver:
                 buffers.append(commands)
         return buffers
 
-    def make_list_to_buffer_files(self, buffers):
-        if len(buffers) > 5 :
+    def make_buffer_files_from_list(self, buffers):
+        if len(buffers) > BUFFER_INDEX_END :
             return
         self.delete_buffer_files()
         empty_start_index = 0
