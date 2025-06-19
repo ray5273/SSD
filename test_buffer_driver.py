@@ -7,6 +7,8 @@ def buffer_driver():
 
 
 def test_get_list_from_buffer_empty_files(buffer_driver):
+    list = []
+    buffer_driver.make_list_to_buffer_files(list)
     assert buffer_driver.get_list_from_buffer_files() == []
 
 def test_get_list_from_buffer_command_files(buffer_driver):
@@ -16,8 +18,8 @@ def test_get_list_from_buffer_command_files(buffer_driver):
     assert buffer_driver.get_list_from_buffer_files() == [command]
 
 def test_get_list_from_buffer_command_files2(buffer_driver):
-    command1 = ('W','0','0x00000000')
-    command2 = ('W','0','0x00000000')
+    command1 = ('W','0','0x00000001')
+    command2 = ('W','0','0x00000002')
     list = [command1, command2]
     buffer_driver.make_list_to_buffer_files(list)
     assert buffer_driver.get_list_from_buffer_files() == list
