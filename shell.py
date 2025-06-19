@@ -1,3 +1,5 @@
+import sys
+
 import click
 import os
 import subprocess
@@ -322,6 +324,64 @@ def shell():
             print("\n👋 종료합니다.")
             break
 
+def is_runner_script_file(filename):
+    return os.path.exists(filename)
+
+
+class Runner():
+    def __init__(self, batch_script):
+        self.batch_script = batch_script
+        self.script_list : list = []
+        self._read_batch_script()
+
+    def _read_batch_script(self):
+        lines = None
+        try:
+            with open(self.batch_script, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+
+            self.script_list = [ item.strip() for item in lines]
+        except Exception:
+            self.script_list = []
+
+    def run(self):
+        for script in self.script_list:
+            print(f'{script} ___ Run...', end='')
+            result = self.run_shell_command(script)
+            print(f'{result}')
+            if result != "PASS": return result
+        return "PASS"
+
+    def get_script_list(self):
+        return self.script_list
+
+    def run_shell_command(self, script):
+        result = "FAIL"
+        if TEST_SCRIPT_1.startswith(script):
+            result = full_write_and_read_compare()
+        elif TEST_SCRIPT_2.startswith(script):
+            result = partial_lba_write_2()
+        elif TEST_SCRIPT_3.startswith(script):
+            result = write_read_aging()
+        elif TEST_SCRIPT_4.startswith(script):
+            result = erase_and_writing_aging()
+        else:
+            return "INVALID COMMAND: SCRIPT NAME ERROR"
+        return result
+
+
+def run_batch_script(script_name):
+    if is_runner_script_file(script_name):
+        runner = Runner(script_name)
+        return runner.run()
+    else:
+        print(f"INVALID COMMAND : BATCH SCRIPT IS NOT EXIST : {script_name}")
+        return "FAIL"
 
 if __name__ == '__main__':
-    shell()
+    command = sys.argv[0]
+    if len(sys.argv) == 2:
+        if "PASS" != run_batch_script(sys.argv[1]):
+            sys.exit(-1)
+    else:
+        shell()
