@@ -5,6 +5,7 @@ MAX_LBA = 100
 TEST_SCRIPT_1 = "1_FullWriteAndReadCompare"
 TEST_SCRIPT_2 = "2_PartialLBAWrite"
 TEST_SCRIPT_3 = "3_WriteReadAging"
+TEST_SCRIPT_4 = "4_EraseAndWriteAging"
 
 
 def is_valid_read_command_params(user_input_list: list[str]) -> bool:
@@ -60,7 +61,8 @@ def is_valid_command(command_param):
     if command_param != "" \
         and (TEST_SCRIPT_1.startswith(command_param) \
             or TEST_SCRIPT_2.startswith(command_param) \
-            or TEST_SCRIPT_3.startswith(command_param)):
+            or TEST_SCRIPT_3.startswith(command_param) \
+            or TEST_SCRIPT_4.startswith(command_param)):
         return True
     if command_param in valid_command_list:
         return True

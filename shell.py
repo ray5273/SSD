@@ -3,11 +3,11 @@ import os
 import subprocess
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, hex_string_generator
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3,TEST_SCRIPT_4, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
-
+INITIAL_VALUE = '0x00000000'
 
 def write(lba, data, output='ssd_output.txt'):
     """write"""
@@ -80,6 +80,8 @@ def fullread():
 def read_compare(lba, data, filename='ssd_output.txt'):
     if read(lba) == data:
         return "PASS"
+    #TODO: DEBUG : Need to REMOVE
+    print(read(lba), data)
     return "FAIL"
 
 def write_and_read_compare_in_range(data, start, end):
@@ -141,6 +143,55 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
                 return "FAIL"
     return "PASS"
 
+def erase_range(start, end):
+    print("TODO: Not implemented.")
+    return True
+
+
+def read_compare_range(start, end):
+    for i in range(start, end+1):
+        if "FAIL" == read_compare(i, INITIAL_VALUE):
+            return "FAIL"
+    return "PASS"
+
+
+def erase_and_writing_aging():
+    '''
+Test Scenario
+• 0 ~ 2번 LBA 삭제
+• Loop 30회
+• 2번 LBA Write
+• 2번 LBA OverWrite
+• 2 ~ 4번 LBA 삭제
+• 4번 LBA Write
+• 4번 LBA OverWrite
+• 4 ~ 6번 LBA 삭제
+• 6번 LBA Write
+• 6번 LBA OverWrite
+• 6 ~ 8번 LBA 삭제
+전체 LBA 영역에 대해
+같은 규칙으로 수행한다.
+여기까지가 1 Cycle 이며 30 Cycle까지 해야한다.
+    :return:
+    '''
+    erase_range(0,2)
+    rcr_result = read_compare_range(0,2)
+    if rcr_result == "FAIL":
+        return rcr_result
+    write(2, hex_string_generator())
+    write(2, hex_string_generator())
+    erase_range(2,4)
+    rcr_result = read_compare_range(2, 4)
+    if rcr_result == "FAIL":
+        return rcr_result
+    write(4, hex_string_generator())
+    write(4, hex_string_generator())
+    erase_range(4, 6)
+    rcr_result = read_compare_range(4, 6)
+    if rcr_result == "FAIL":
+        return rcr_result
+    return rcr_result
+
 
 def shell():
     """무한 루프 쉘 모드"""
@@ -189,6 +240,8 @@ def shell():
                 print(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
+            elif TEST_SCRIPT_4.startswith(command_param):
+                print(erase_and_writing_aging())
             elif command_param == "help":
                 help()
             else:
