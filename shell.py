@@ -337,24 +337,37 @@ class Runner():
         self._read_batch_script()
 
     def _read_batch_script(self):
+        lines = None
         try:
             with open(self.batch_script, 'r', encoding='utf-8') as f:
-                self.script_list = f.readlines()
+                lines = f.readlines()
+
+            self.script_list = [ item.strip() for item in lines]
         except Exception:
             self.script_list = []
 
     def run(self):
         for script in self.script_list:
-            script = script.string()
             print(f'{script} ___ Run...', end='')
             result = self.run_shell_command(script)
             print(f'{result}')
+            if result != "PASS": return result
+        return "PASS"
 
     def get_script_list(self):
         return self.script_list
 
-    def run_shell_command(self):
-        return "PASS"
+    def run_shell_command(self, script):
+        result = "FAIL"
+        if TEST_SCRIPT_1.startswith(script):
+            result = full_write_and_read_compare()
+        elif TEST_SCRIPT_2.startswith(script):
+            result = partial_lba_write_2()
+        elif TEST_SCRIPT_3.startswith(script):
+            result = write_read_aging()
+        else:
+            return "INVALID COMMAND: SCRIPT NAME ERROR"
+        return result
 
 
 
