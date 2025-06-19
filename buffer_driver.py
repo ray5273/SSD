@@ -3,13 +3,17 @@ import os
 EMPTY_BUFFER = "empty"
 BUFFER_INDEX_START = 1
 BUFFER_INDEX_END = 5
-BUFFER_FILE_PARAMETERS = 4
+NUM_BUFFER_FILE_PARAMETERS = 4
 
 
 class BufferDriver:
     def __init__(self):
         self.buffer_folder = "buffer_folder"
         self.make_buffer_folder()
+
+    def make_buffer_file(self, file_name):
+        with open(os.path.join(self.buffer_folder, file_name), "w", encoding="utf-8") as f:
+            pass
 
     def make_buffer_folder(self):
         if not os.path.exists(self.buffer_folder):
@@ -24,7 +28,7 @@ class BufferDriver:
     def get_parameters(self, buffer_file: str):
         parsed_file_name = buffer_file.split('_')
         commands = parsed_file_name[1:]
-        if len(parsed_file_name) == BUFFER_FILE_PARAMETERS:
+        if len(parsed_file_name) == NUM_BUFFER_FILE_PARAMETERS:
             return tuple(commands)
         return None
 
@@ -55,11 +59,11 @@ class BufferDriver:
                 lba = commands[1]
                 count_or_data = commands[2]
                 buffer_file_name = f"{index + 1}_{command}_{lba}_{count_or_data}"
-                with open(os.path.join(self.buffer_folder, buffer_file_name), "w", encoding="utf-8") as f:
-                    pass
+                self.make_buffer_file(buffer_file_name)
+
             empty_start_index += 1
+
         while empty_start_index < 5:
             buffer_file_name = f"{empty_start_index + 1}_empty"
-            with open(os.path.join(self.buffer_folder, buffer_file_name), "w", encoding="utf-8") as f:
-                pass
+            self.make_buffer_file(buffer_file_name)
             empty_start_index += 1
