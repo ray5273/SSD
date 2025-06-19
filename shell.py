@@ -80,8 +80,6 @@ def fullread():
 def read_compare(lba, data, filename='ssd_output.txt'):
     if read(lba) == data:
         return "PASS"
-    #TODO: DEBUG : Need to REMOVE
-    print(read(lba), data)
     return "FAIL"
 
 def write_and_read_compare_in_range(data, start, end):
@@ -165,7 +163,6 @@ def erase_and_writing_aging():
 
     erase_range(0,2)
     result = read_compare_range(0,2)
-    # print(f'Cycle#0 : {result}')
     if result == "FAIL":
         return "FAIL"
 
@@ -174,7 +171,6 @@ def erase_and_writing_aging():
         cycle_cnt+=1
         if cycle_cnt > 30: break
         result = erase_and_writing_aging_cycle(i, i+2)
-        # print(f'Cycle#{cycle_cnt} : {result}')
         if result == "FAIL":
             return "FAIL"
     return "PASS"
