@@ -25,21 +25,19 @@ def check_write_and_read(_ssd, addr, wdata):
     assert_output_file(wdata)
 
 
-
 def read_nand_data(_ssd, addr):
-    _ssd.run([READ_COMMAND, addr])
+    _ssd.run([READ_COMMAND, f"{addr}"])
     return read_output_file()
 
 def read_ssd_data(_ssd, addr):
-    _ssd.run([READ_COMMAND, addr])
+    _ssd.run([READ_COMMAND, f"{addr}"])
     return _ssd.result
 
-
 def write_data(_ssd, addr, data):
-    _ssd.run([WRITE_COMMAND, addr, data])
+    _ssd.run([WRITE_COMMAND, f"{addr}", data])
 
 def erase_data(_ssd, addr, size):
-    _ssd.run([ERASE_COMMAND, addr, size])
+    _ssd.run([ERASE_COMMAND, f"{addr}", f"{size}"])
 
 def write_incr(_ssd, start_addr, data_list):
     for addr, data in enumerate(data_list, start = int(start_addr)):
