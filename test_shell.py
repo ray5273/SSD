@@ -44,23 +44,23 @@ def test_read_mock_with_valid_lba(mocker):
     # temp output 파일 생성.
     test_data = '0x99ABCDEF'
     test_filename = get_test_ssd_output_file(data=test_data)
-    with patch('builtins.print') as mock_print:
-        shell.read(3, filename=test_filename)
-        mock_print.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
+    mock_logger = mocker.patch('shell.LOGGER.print_log')
+    shell.read(3, filename=test_filename)
+    mock_logger.assert_called_once_with("[READ] LBA 03 : 0x99ABCDEF")
 
 
 def test_write(mocker):
     # temp output 파일 생성.
     test_data = '0x99ABCDEF'
     test_filename = get_test_ssd_output_file(data=test_data)
-    with patch('builtins.print') as mock_print:
-        mocker.patch('shell.call_system', return_value=0)
-        shell.write(3, '0x99ABCDEF', test_filename)
-        expected_calls = [
-            mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
-            mocker.call('[WRITE] Done')
-        ]
-        mock_print.assert_has_calls(expected_calls)
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+    mocker.patch('shell.call_system', return_value=0)
+    shell.write(3, '0x99ABCDEF', test_filename)
+    expected_calls = [
+        mocker.call('[READ] LBA 03 : 0x99ABCDEF'),
+        mocker.call('[WRITE] Done')
+    ]
+    mock_logger.assert_has_calls(expected_calls)
 
 
 def test_shell_help(capsys):
@@ -111,14 +111,14 @@ def test_fullwrite_error_on_random_write(mocker):
         if lba == error_lba:
             raise RuntimeError("write error")
 
-    mock_print = mocker.patch("builtins.print")
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
     mocker.patch("shell.write", side_effect=side_effect)
 
     # When: fullwrite()를 실행하면
     shell.fullwrite("0xABCD")
 
     # Then: fullwrite 에러 발생 print가 확인되어야함.
-    mock_print.assert_any_call("fullwrite 에러 발생")
+    mock_logger.assert_any_call("fullwrite 에러 발생")
 
 
 def test_fullread_success(mocker):
@@ -148,11 +148,11 @@ def test_fullread_error_on_random_read(mocker):
             raise RuntimeError("write error")
 
     mocker.patch("shell.read", side_effect=side_effect)
-    mock_print = mocker.patch("builtins.print")
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
     # When: fullread()를 실행하면
     shell.fullread()
     # Then: fullread 에러 발생 print가 확인되어야함.
-    mock_print.assert_any_call("fullread 에러 발생")
+    mock_logger.assert_any_call("fullread 에러 발생")
 
 
 def test_TestScript1(mocker):
@@ -165,10 +165,6 @@ def test_TestScript1(mocker):
     mocker.patch('shell.write', side_effect = mock_write)
     mocker.patch('shell.read', side_effect=mock_read)
     assert shell.full_write_and_read_compare() == "PASS"
-
-@pytest.mark.skip
-def test_TestScript1_with_shell_command():
-    ...
 
 def test_write_read_aging_success(mocker):
     # write는 아무 동작도 하지 않음
