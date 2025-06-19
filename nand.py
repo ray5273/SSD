@@ -38,3 +38,24 @@ class Nand:
 
         with open(self.data_file, 'w', encoding='utf-8') as f:
             f.writelines(lines)
+
+    def erase(self, start_address, size):
+        if size == 0:
+            return
+
+        if start_address >= self.lba_length:
+            raise Exception
+
+        end_address = start_address + size - 1
+        if end_address >= self.lba_length:
+            raise Exception
+
+        with open(self.data_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        for address in range(start_address, end_address + 1):
+            lines[address] = self.default_data + '\n'
+
+        with open(self.data_file, 'w', encoding='utf-8') as f:
+            f.writelines(lines)
+        return
