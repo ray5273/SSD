@@ -14,6 +14,7 @@ OUTPUT_FILE = "test_ssd_output.txt"
 DEFAULT_DATA = "0x00000000"
 WRITE_COMMAND = "W"
 READ_COMMAND = "R"
+ERASE_COMMAND = "E"
 ERROR_MESSAGE = "ERROR"
 FIRST_ADDRESS = "0"
 LAST_ADDRESS = f"{LBA_LENGTH-1}"
@@ -25,15 +26,30 @@ def remove_files():
     if os.path.exists(OUTPUT_FILE):
         os.remove(OUTPUT_FILE)
 
-def assert_output_file(expected):
+
+def read_output_file():
     with open(OUTPUT_FILE, 'r') as f:
-        content = f.read()
-        assert content == expected
+        return f.read()
+
+def assert_output_file(expected):
+    assert read_output_file() == expected
+
 
 def check_write_and_read(_ssd, addr, wdata):
     _ssd.run([WRITE_COMMAND, addr, wdata])
     _ssd.run([READ_COMMAND, addr])
     assert_output_file(wdata)
+
+
+def read_data(_ssd, addr):
+    _ssd.run([READ_COMMAND, addr])
+    return read_output_file()
+
+def write_data(_ssd, addr, data):
+    _ssd.run([WRITE_COMMAND, addr, data])
+
+def erase_data(_ssd, addr, size):
+    _ssd.run([ERASE_COMMAND, addr, size])
 
 @pytest.fixture
 def clean_ssd():
@@ -129,6 +145,34 @@ class TestSsdWithMock:
         ssd.run([WRITE_COMMAND, FIRST_ADDRESS, "invalid_data"])
         assert ssd.result == ERROR_MESSAGE
 
+
+class TestSsdEraseWithMock:
+    @pytest.mark.parametrize( ("addr", "size"), [
+        (FIRST_ADDRESS, "1"),
+        (LAST_ADDRESS, "1"),
+        (FIRST_ADDRESS, "10")
+    ])
+    def test_erase_1_call(self, ssd_and_device, addr, size):
+        ssd, device = ssd_and_device
+        ssd.run([ERASE_COMMAND, addr, size])
+        device.erase.assert_called_with(int(addr), int(1))
+
+    def test_invalid_erase_size(self, ssd_and_device):
+        ssd, device = ssd_and_device
+        ssd.run([ERASE_COMMAND, FIRST_ADDRESS, "11"])
+        assert ssd.result == ERROR_MESSAGE
+
+    def test_erase_out_of_bounds(self, ssd_and_device):
+        ssd, device = ssd_and_device
+        ssd.run([ERASE_COMMAND, LAST_ADDRESS, "2"])
+        assert ssd.result == ERROR_MESSAGE
+
+    def test_erase_invalid_address(self, ssd_and_device):
+        ssd, device = ssd_and_device
+        ssd.run([ERASE_COMMAND, "-1", "2"])
+        assert ssd.result == ERROR_MESSAGE
+
+
 class TestSsd:
     def test_file_creation(self, clean_ssd):
         """
@@ -208,3 +252,22 @@ class TestSsd:
         clean_ssd.run([WRITE_COMMAND, "12345678", "0x000000000"])
         assert_output_file(ERROR_MESSAGE)
 
+
+
+class TestSsdErase:
+    def test_erase_1(self, clean_ssd):
+        addr = FIRST_ADDRESS
+        wdata = "0x1234abcd"
+        check_write_and_read(clean_ssd, addr, wdata)
+        erase_data(clean_ssd, FIRST_ADDRESS, "1")
+        assert read_data(clean_ssd, FIRST_ADDRESS) == DEFAULT_DATA
+
+    def test_erase_10(self, clean_ssd):
+        for i in range(10):
+            addr = f"{i}"
+            wdata = f"0x0000000{i}"
+            write_data(clean_ssd, addr, wdata)
+        erase_data(clean_ssd, FIRST_ADDRESS, "10")
+        for i in range(10):
+            addr = f"{i}"
+            assert read_data(clean_ssd, addr) == DEFAULT_DATA
