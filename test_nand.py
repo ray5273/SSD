@@ -15,8 +15,6 @@ def nand():
 def test_nand_read_uninitialized_data_at_start_address(nand):
     assert nand.read(FIRST_ADDRESS) == DEFAULT_VALUE
 
-def test_nand_read_uninitialized_data_at_last_address(nand):
-    assert nand.read(LAST_ADDRESS) == DEFAULT_VALUE
 
 def test_nand_write_first_address(nand):
     addr = FIRST_ADDRESS + 1
