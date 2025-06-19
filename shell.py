@@ -117,6 +117,7 @@ def erase(lba:int, size:int):
             remaining -= chunk_size
         else:
             print("Erase 에러 발생")
+            return
 
 
 
