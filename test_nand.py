@@ -55,7 +55,7 @@ def test_erase_success(nand):
         nand.write(addr+i,"0x11111111")
     nand.erase(addr,size)
     for i in range(5):
-        assert nand.read(addr+i) == "0x00000000"
+        assert nand.read(addr+i) == DEFAULT_VALUE
 
 
 def test_erase_success_bound(nand):
@@ -65,7 +65,7 @@ def test_erase_success_bound(nand):
         nand.write(addr+i,"0x11111111")
     nand.erase(addr,size)
     for i in range(5):
-        assert nand.read(addr+i) == "0x00000000"
+        assert nand.read(addr+i) == DEFAULT_VALUE
 
 def test_erase_fail_upper_bound(nand):
     addr = LAST_ADDRESS-4

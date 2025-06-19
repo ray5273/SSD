@@ -18,21 +18,20 @@ class Nand:
                 f.write(f"{self.default_data}\n")
 
     def read(self, address) -> str:
+        if address < 0 or address >= self.lba_length:
+            raise Exception
+
         with open(self.data_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-
-        if address >= len(lines):
-            raise Exception
 
         return lines[address].strip()
 
     def write(self, address, wdata):
+        if address < 0 or address >= self.lba_length:
+            raise Exception
 
         with open(self.data_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-
-        if address >= len(lines):
-            raise Exception
 
         lines[address] = wdata + '\n'
 
@@ -43,7 +42,8 @@ class Nand:
         if size == 0:
             return
 
-        if start_address >= self.lba_length:
+        if start_address < 0 or start_address >= self.lba_length:
+            raise Exception
             raise Exception
 
         end_address = start_address + size - 1
