@@ -317,10 +317,47 @@ def shell():
             elif command_param == "help":
                 help()
             else:
-                print("❓ 알 수 없는 명령입니다.")
+                if is_runner_script_file(command_param):
+                    runner = Runner(command_param)
+                    runner.run()
+                else:
+                    print("❓ 알 수 없는 명령입니다.")
         except (KeyboardInterrupt, EOFError):
             print("\n👋 종료합니다.")
             break
+
+def is_runner_script_file(filename):
+    return os.path.exists(filename)
+
+
+class Runner():
+    def __init__(self, batch_script):
+        self.batch_script = batch_script
+        self.script_list : list = []
+        self._read_batch_script()
+
+    def _read_batch_script(self):
+        try:
+            with open(self.batch_script, 'r', encoding='utf-8') as f:
+                self.script_list = f.readlines()
+        except Exception:
+            self.script_list = []
+
+    def run(self):
+        for script in self.script_list:
+            script = script.string()
+            print(f'{script} ___ Run...', end='')
+            result = self.run_shell_command(script)
+            print(f'{result}')
+
+    def get_script_list(self):
+        return self.script_list
+
+    def run_shell_command(self):
+        return "PASS"
+
+
+
 
 
 if __name__ == '__main__':
