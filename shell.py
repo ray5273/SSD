@@ -3,11 +3,11 @@ import os
 import subprocess
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, \
-    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, hex_string_generator
+    is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3,TEST_SCRIPT_4, hex_string_generator
 
 # SSD 테스트에 쓰이는 constants
 MAX_LBA = 100
-
+INITIAL_VALUE = '0x00000000'
 
 def write(lba, data, output='ssd_output.txt'):
     """write"""
@@ -141,6 +141,39 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
                 return "FAIL"
     return "PASS"
 
+def erase_range(start, end):
+    print("TODO: Not implemented.")
+    return True
+
+
+def read_compare_range(start, end):
+    for i in range(start, end+1):
+        if "FAIL" == read_compare(i, INITIAL_VALUE):
+            return "FAIL"
+    return "PASS"
+
+
+def erase_and_writing_aging_cycle(start, end):
+    write(start, hex_string_generator())
+    write(start, hex_string_generator())
+    erase_range(start ,end)
+    return read_compare_range(start, end)
+
+def erase_and_writing_aging():
+
+    erase_range(0,2)
+    result = read_compare_range(0,2)
+    if result == "FAIL":
+        return "FAIL"
+
+    cycle_cnt = 0
+    for i in range(2, 100, 2):
+        cycle_cnt+=1
+        if cycle_cnt > 30: break
+        result = erase_and_writing_aging_cycle(i, i+2)
+        if result == "FAIL":
+            return "FAIL"
+    return "PASS"
 
 def shell():
     """무한 루프 쉘 모드"""
@@ -189,6 +222,8 @@ def shell():
                 print(partial_lba_write_2())
             elif TEST_SCRIPT_3.startswith(command_param):
                 print(write_read_aging())
+            elif TEST_SCRIPT_4.startswith(command_param):
+                print(erase_and_writing_aging())
             elif command_param == "help":
                 help()
             else:
