@@ -111,12 +111,12 @@ def erase(lba:int, size:int):
             status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
 
             if status >= 0:
+                # Todo debugging
                 print(f"[ERASE] E {actual_lba:02} {chunk_size}")
                 current_lba += chunk_size * direction
                 remaining -= chunk_size
             else:
                 print("Erase 에러 발생")
-                return
         # fullread()
     except:
         print("erase 에러 발생")
@@ -152,6 +152,7 @@ def erase_range(lba_start: int, lba_end: int):
             status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
 
             if status >= 0:
+                # Todo debugging
                 print(f"[ERASE] E {current_lba:02} {chunk_size}")
                 current_lba += chunk_size
                 remaining -= chunk_size
@@ -226,10 +227,6 @@ def partial_lba_write_2(filename='ssd_output.txt', data='0xAAAABBBB'):
             if read_compare(lba, data, filename) == "FAIL":
                 return "FAIL"
     return "PASS"
-
-def erase_range(start, end):
-    print("TODO: Not implemented.")
-    return True
 
 
 def read_compare_range(start, end):
