@@ -44,7 +44,6 @@ class Nand:
 
         if start_address < 0 or start_address >= self.lba_length:
             raise Exception
-            raise Exception
 
         end_address = start_address + size - 1
         if end_address >= self.lba_length:

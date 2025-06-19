@@ -1,10 +1,14 @@
-import dataclasses
-
-from command import Command, CommandSpec
-from file_output import FileOutput
-from lba_validator import LBAValidator
-from nand import Nand
 import sys
+
+from command import Command
+from erase_command import EraseSSDCommand
+from read_command import ReadSSDCommand
+from unknown_command import UnknownSSDCommand
+from write_command import WriteSSDCommand
+
+from file_output import FileOutput
+from nand import Nand
+
 
 class SSD:
     LBA_LENGTH = 100
@@ -14,47 +18,35 @@ class SSD:
     def __init__(self, device):
         self._device = device
         self._out_writer = FileOutput(self.OUTPUT_FILE)
-        self._last_result = None
-        self._param_validator = LBAValidator(CommandSpec(), self.LBA_LENGTH)
-
-    @property
-    def result(self):
-        return self._last_result
-
-    @result.setter
-    def result(self, value):
-        self._out_writer.write(value)
-        self._last_result = value
+        self.result = ""
+        self.commands = {
+            Command.READ: ReadSSDCommand(self._device, self._out_writer),
+            Command.WRITE: WriteSSDCommand(self._device, self._out_writer),
+            Command.ERASE: EraseSSDCommand(self._device, self._out_writer)}
 
     def run(self, params: list) -> bool:
-        params = [param.strip() for param in params]
-
-        if not self._param_validator.is_valid(params):
-            self.result = self.ERROR_MSG
+        if not params:
+            self.write_error()
             return False
 
-        command, address = params[0], int(params[1])
+        command = self.commands.get(params[0], UnknownSSDCommand(self._out_writer))
+
         try:
-            if command == Command.READ:
-                self.result = self._device.read(address)
-            if command == Command.WRITE:
-                value = params[2]
-                self._device.write(address, value)
-                self.result = ""
-            if command == Command.ERASE:
-                count = params[2]
-                self.result = self._device.erase()
-        except Exception as e:
-            self.result = self.ERROR_MSG
+            self.result = command.execute(params)
+        except Exception:
+            self.write_error()
             return False
+
         return True
 
+    def write_error(self):
+        self.result = self.ERROR_MSG
+        self._out_writer.write(self.result)
 
 FILE_PATH = "ssd_nand.txt"
 LBA_LENGTH = 100
 
 if __name__ == "__main__":
-
     nand = Nand(LBA_LENGTH, FILE_PATH)
     ssd = SSD(nand)
 
