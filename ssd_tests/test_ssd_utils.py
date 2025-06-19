@@ -25,6 +25,7 @@ def check_write_and_read(_ssd, addr, wdata):
     assert_output_file(wdata)
 
 
+
 def read_nand_data(_ssd, addr):
     _ssd.run([READ_COMMAND, addr])
     return read_output_file()
@@ -32,6 +33,7 @@ def read_nand_data(_ssd, addr):
 def read_ssd_data(_ssd, addr):
     _ssd.run([READ_COMMAND, addr])
     return _ssd.result
+
 
 def write_data(_ssd, addr, data):
     _ssd.run([WRITE_COMMAND, addr, data])

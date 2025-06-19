@@ -105,6 +105,7 @@ class TestSsdWithFake:
         assert ssd.result == wdata
 
 
+
 class TestSsd:
     def test_file_creation(self, ssd):
         """
