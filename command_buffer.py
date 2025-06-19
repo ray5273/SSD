@@ -39,8 +39,8 @@ class CommandBuffer():
 
     def ignore_write(self, buffers):
         size = len(buffers)
-        delete_index_list = []
-        for i in range(size - 1, -1, -1):
+        delete_index_set = set()
+        for i in range(size - 1, 0, -1):
             commands = buffers[i]
             command = commands[0]
             lba = commands[1]
@@ -49,17 +49,63 @@ class CommandBuffer():
                 continue
             start_address = lba
             end_address = lba + count_or_data - 1
-            for j in range(size - 1, -1, -1):
+            for j in range(i - 1, -1, -1):
                 commands = buffers[j]
                 command_left = commands[0]
                 lba_left = commands[1]
-                count_or_data_left = commands[2]
                 if command_left == "E":
                     continue
                 if lba_left >= start_address and lba_left <= end_address:
-                    delete_index_list.append(j)
-        for delete_index in delete_index_list:
-            del buffers[delete_index]
+                    delete_index_set.add(j)
+
+        result_buffers = []
+        for index, buffer in enumerate(buffers):
+            if index in delete_index_set:
+                continue
+            result_buffers.append(buffer)
+
+    def ignore_erase(self, buffers):
+        size = len(buffers)
+        delete_index_set = set()
+        for i in range(0, size - 1):
+            commands = buffers[i]
+            command = commands[0]
+            lba = commands[1]
+            count_or_data = commands[2]
+            if command == "W":
+                continue
+            start_address = lba
+            end_address = lba + count_or_data - 1
+
+            is_write = [False] * count_or_data
+
+            for j in range(i + 1, size):
+                commands = buffers[j]
+                command_right = commands[0]
+                lba_right = commands[1]
+                if command_right == "E":
+                    continue
+                if lba_right >= start_address and lba_right <= end_address:
+                    is_write[lba_right - start_address] = True
+
+            is_ignore_erase_possible = True
+            for i in range(count_or_data):
+                if is_write[i] is False:
+                    is_ignore_erase_possible = False
+                    break
+
+            if is_ignore_erase_possible:
+                delete_index_set.add(i)
+
+        result_buffers = []
+        for index, buffer in enumerate(buffers):
+            if index in delete_index_set:
+                continue
+            result_buffers.append(buffer)
+        return result_buffers
+
+    def merge_erase(self):
+        pass
 
     def optimize(self, buffers):
         pass
