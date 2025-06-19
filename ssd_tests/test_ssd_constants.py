@@ -3,10 +3,12 @@
 LBA_LENGTH = 100
 NAND_FILE = "test_ssd_nand.txt"
 OUTPUT_FILE = "test_ssd_output.txt"
+BUFFER_DIR = 'test_command_buffer'
 DEFAULT_DATA = "0x00000000"
 WRITE_COMMAND = "W"
 READ_COMMAND = "R"
 ERASE_COMMAND = "E"
+FLUSH_COMMAND = "F"
 ERROR_MESSAGE = "ERROR"
 FIRST_ADDRESS = "0"
 LAST_ADDRESS = f"{LBA_LENGTH-1}"

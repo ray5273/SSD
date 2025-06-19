@@ -39,6 +39,9 @@ def write_data(_ssd, addr, data):
 def erase_data(_ssd, addr, size):
     _ssd.run([ERASE_COMMAND, f"{addr}", f"{size}"])
 
+def flush_buffer(_ssd):
+    _ssd.run([FLUSH_COMMAND])
+
 def write_incr(_ssd, start_addr, data_list):
     for addr, data in enumerate(data_list, start = int(start_addr)):
         write_data(_ssd, f"{addr}", data)
