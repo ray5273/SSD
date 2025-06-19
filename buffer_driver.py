@@ -10,6 +10,17 @@ class BufferDriver:
     def __init__(self):
         self.buffer_folder = "buffer_folder"
         self.make_buffer_folder()
+        self.create_empty_files()
+
+    def create_empty_files(self):
+        for index in range(BUFFER_INDEX_START, BUFFER_INDEX_END + 1):
+            is_file_exist = False
+            for buffer_file in os.listdir(self.buffer_folder):
+                if buffer_file.startswith(f"{index}_"):
+                    is_file_exist = True
+                    break
+            if is_file_exist is False:
+                self.make_buffer_file(f"{index}_"+EMPTY_BUFFER)
 
     def make_buffer_file(self, file_name):
         with open(os.path.join(self.buffer_folder, file_name), "w", encoding="utf-8") as f:
