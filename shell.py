@@ -1,6 +1,5 @@
 import sys
 
-import click
 import os
 import subprocess
 from logger import LOGGER, LATEST_FILE, MAX_BYTES
