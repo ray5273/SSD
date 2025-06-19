@@ -16,8 +16,8 @@ class Logger:
         self.max_bytes = max_bytes
 
     # runner의 출력은 stdout에만 찍히면 되므로 이 메세지를 통해서 출력을함.
-    def print_always(self, message: str):
-        print(message)
+    def print_always(self, message: str, end="\n", flush=True):
+        print(message, end=end, flush=flush)
 
     def print_log(self, message: str):
         """
@@ -118,5 +118,6 @@ class Logger:
 
 # 싱글톤 구현
 LATEST_FILE = "latest.log"
+MAX_BYTES = 10240
 # 10KB, latest.log에 파일쓰기, stdout은 True가 Default
-LOGGER = Logger(is_stdout=True, file_path=LATEST_FILE, max_bytes=10240, test_mode=False)
+LOGGER = Logger(is_stdout=True, file_path=LATEST_FILE, max_bytes=MAX_BYTES, test_mode=False)

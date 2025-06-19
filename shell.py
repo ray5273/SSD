@@ -3,7 +3,7 @@ import sys
 import click
 import os
 import subprocess
-from logger import LOGGER
+from logger import LOGGER, LATEST_FILE, MAX_BYTES
 
 from shell_command_validator import is_valid_command, is_valid_read_command_params, is_valid_write_command_params, is_valid_erase_command_params, \
     is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, TEST_SCRIPT_4, hex_string_generator
@@ -347,9 +347,9 @@ class Runner():
 
     def run(self):
         for script in self.script_list:
-            print(f'{script} ___ Run...', end='')
+            LOGGER.print_always(f'{script} ___ Run...', end='')
             result = self.run_shell_command(script)
-            print(f'{result}')
+            LOGGER.print_always(f'{result}')
             if result != "PASS": return result
         return "PASS"
 
@@ -367,7 +367,7 @@ class Runner():
         elif TEST_SCRIPT_4.startswith(script):
             result = erase_and_writing_aging()
         else:
-            return "INVALID COMMAND: SCRIPT NAME ERROR"
+            return "FAIL"
         return result
 
 
@@ -376,12 +376,13 @@ def run_batch_script(script_name):
         runner = Runner(script_name)
         return runner.run()
     else:
-        print(f"INVALID COMMAND : BATCH SCRIPT IS NOT EXIST : {script_name}")
+        LOGGER.print_log(f"INVALID COMMAND : BATCH SCRIPT IS NOT EXIST : {script_name}")
         return "FAIL"
 
 if __name__ == '__main__':
     command = sys.argv[0]
     if len(sys.argv) == 2:
+        LOGGER.update_settings(is_stdout=False,file_path=LATEST_FILE, max_bytes=MAX_BYTES)
         if "PASS" != run_batch_script(sys.argv[1]):
             sys.exit(-1)
     else:
