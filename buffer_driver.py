@@ -20,7 +20,7 @@ class BufferDriver:
                     is_file_exist = True
                     break
             if is_file_exist is False:
-                self.make_buffer_file(f"{index}_"+EMPTY_BUFFER)
+                self.make_buffer_file(f"{index}_" + EMPTY_BUFFER)
 
     def make_buffer_file(self, file_name):
         with open(os.path.join(self.buffer_folder, file_name), "w", encoding="utf-8") as f:
@@ -39,8 +39,14 @@ class BufferDriver:
     def get_parameters(self, buffer_file: str):
         parsed_file_name = buffer_file.split('_')
         commands = parsed_file_name[1:]
+        command = commands[0]
+        lba = commands[1]
+        count_or_data = commands[2]
         if len(parsed_file_name) == NUM_BUFFER_FILE_PARAMETERS:
-            return tuple(commands)
+            lba = int(lba)
+            if command == 'E':
+                count_or_data = int(count_or_data)
+            return tuple([command, lba, count_or_data])
         return None
 
     def get_list_from_buffer_files(self):
@@ -59,7 +65,7 @@ class BufferDriver:
         return buffers
 
     def make_buffer_files_from_list(self, buffers):
-        if len(buffers) > BUFFER_INDEX_END :
+        if len(buffers) > BUFFER_INDEX_END:
             return
         self.delete_buffer_files()
         empty_start_index = 0
