@@ -365,6 +365,8 @@ class Runner():
             result = partial_lba_write_2()
         elif TEST_SCRIPT_3.startswith(script):
             result = write_read_aging()
+        elif TEST_SCRIPT_4.startswith(script):
+            result = erase_and_writing_aging()
         else:
             return "INVALID COMMAND: SCRIPT NAME ERROR"
         return result

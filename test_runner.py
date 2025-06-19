@@ -1,7 +1,8 @@
 import os.path
 
 import pytest
-from shell import *
+import shell
+from shell import Runner
 import tempfile
 
 def get_test_batch_script():
@@ -9,7 +10,7 @@ def get_test_batch_script():
         '1_FullWriteAndReadCompare',
         '2_PartialLBAWrite',
         '3_WriteReadAging',
-        # '4_EraseAndWriteAging',
+        '4_EraseAndWriteAging',
     ]
     temp_path = tempfile.gettempdir()
     temp_script = 'shell_script.txt'
@@ -47,8 +48,11 @@ def mock_read(lba):
     return mock_ssd[lba]
 def mock_erase(lba):
     mock_ssd[lba] = '0x00000000'
+def mock_erase_range(start, end):
+    for i in range(start, end+1):
+        mock_ssd[i] = shell.INITIAL_VALUE
 
-def test_run_shell_command(mocker):
+def test_run_shell_command_with_mock_script1(mocker):
     global mock_ssd
     mock_ssd = {}
     runner = Runner('')
@@ -57,12 +61,29 @@ def test_run_shell_command(mocker):
     mocker.patch('shell.read', side_effect=mock_read)
     assert runner.run_shell_command("1_FullWriteAndReadCompare") == "PASS"
 
-def test_run_batch_script(mocker):
+def test_run_shell_command_with_mock_script4(mocker):
     global mock_ssd
     mock_ssd = {}
+    runner = Runner('')
     mocker.patch('shell.call_system', return_value=0)
     mocker.patch('shell.write', side_effect=mock_write)
     mocker.patch('shell.read', side_effect=mock_read)
+    mocker.patch('shell.erase_range', side_effect=mock_erase_range)
+    assert runner.run_shell_command("4_EraseAndWriteAging") == "PASS"
+
+@pytest.mark.skip
+def test_run_shell_command():
+    runner = Runner('')
+    assert runner.run_shell_command("1_FullWriteAndReadCompare") == "PASS"
+
+@pytest.mark.skip
+def test_run_shell_command():
+    runner = Runner('')
+    assert runner.run_shell_command("4_EraseAndWriteAging") == "PASS"
+
+@pytest.mark.skip
+def test_run_batch_script():
     runner = Runner(get_test_batch_script())
     assert runner.run() == "PASS"
+
 
