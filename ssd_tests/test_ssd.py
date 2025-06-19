@@ -91,6 +91,19 @@ class TestSsdWithMock:
         assert ssd.result == ERROR_MESSAGE
 
 
+class TestSsdWithFake:
+    def test_fake_read(self, fake_ssd_and_device):
+        ssd, device = fake_ssd_and_device
+        ssd.run([READ_COMMAND, FIRST_ADDRESS])
+        assert ssd.result == DEFAULT_DATA
+
+    def test_fake_write(self, fake_ssd_and_device):
+        ssd, device = fake_ssd_and_device
+        wdata = "0x1234abcd"
+        ssd.run([WRITE_COMMAND, FIRST_ADDRESS, wdata])
+        ssd.run([READ_COMMAND, FIRST_ADDRESS])
+        assert ssd.result == wdata
+
 
 
 class TestSsd:
