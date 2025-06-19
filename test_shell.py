@@ -62,6 +62,62 @@ def test_write(mocker):
     ]
     mock_logger.assert_has_calls(expected_calls)
 
+def test_erase(mocker):
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.erase(3, 11)
+        expected_calls = [
+            mocker.call('[ERASE] E 03 10'),
+            mocker.call('[ERASE] E 13 1'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
+
+def test_erase_over_max_lba(mocker):
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.erase(99, 10)
+        expected_calls = [
+            mocker.call('[ERASE] E 99 1'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
+
+def test_erase_minus(mocker):
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.erase(3, -10)
+        expected_calls = [
+            mocker.call('[ERASE] E 00 4'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
+
+def test_erase_range(mocker):
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.erase_range(3, 10)
+        expected_calls = [
+            mocker.call('[ERASE] E 03 8'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
+
+def test_erase_range_change_start_end(mocker):
+    mock_logger = mocker.patch('shell.LOGGER.print_log')  # LOGGER.print_log로 패치
+
+    with patch('builtins.print') as mock_print:
+        mocker.patch('shell.call_system', return_value=0)
+        shell.erase_range(10, 3)
+        expected_calls = [
+            mocker.call('[ERASE] E 03 8'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
+
 
 def test_shell_help(capsys):
     inputs = [
