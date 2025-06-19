@@ -200,16 +200,18 @@ def test_partial_lba_write_2_fail(mocker):
     assert shell.partial_lba_write_2() == "FAIL"
 
 
-def test_erase_and_writing_aging(mocker):
+mock_ssd = {}
+def mock_write(lba, data):
+    mock_ssd[lba] = data
+def mock_read(lba):
+    return mock_ssd[lba]
+def mock_erase_range(start, end):
+    for i in range(start, end+1):
+        mock_ssd[i] = shell.INITIAL_VALUE
 
+def test_erase_and_writing_aging(mocker):
+    global mock_ssd
     mock_ssd = {}
-    def mock_write(lba, data):
-        mock_ssd[lba] = data
-    def mock_read(lba):
-        return mock_ssd[lba]
-    def mock_erase_range(start, end):
-        for i in range(start, end+1):
-            mock_ssd[i] = shell.INITIAL_VALUE
 
     mocker.patch('shell.call_system', return_value=0)
     mocker.patch('shell.write', side_effect=mock_write)
@@ -217,3 +219,14 @@ def test_erase_and_writing_aging(mocker):
     mocker.patch('shell.erase_range', side_effect=mock_erase_range)
 
     assert shell.erase_and_writing_aging() == 'PASS'
+
+def test_erase_and_writing_aging_cycle(mocker):
+    global mock_ssd
+    mock_ssd = {}
+
+    mocker.patch('shell.call_system', return_value=0)
+    mocker.patch('shell.write', side_effect=mock_write)
+    mocker.patch('shell.read', side_effect=mock_read)
+    mocker.patch('shell.erase_range', side_effect=mock_erase_range)
+    assert shell.erase_and_writing_aging_cycle(0,2) == "PASS"
+    assert shell.erase_and_writing_aging_cycle(5, 7) == "PASS"

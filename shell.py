@@ -155,43 +155,29 @@ def read_compare_range(start, end):
     return "PASS"
 
 
-def erase_and_writing_aging():
-    '''
-Test Scenario
-• 0 ~ 2번 LBA 삭제
-• Loop 30회
-• 2번 LBA Write
-• 2번 LBA OverWrite
-• 2 ~ 4번 LBA 삭제
-• 4번 LBA Write
-• 4번 LBA OverWrite
-• 4 ~ 6번 LBA 삭제
-• 6번 LBA Write
-• 6번 LBA OverWrite
-• 6 ~ 8번 LBA 삭제
-전체 LBA 영역에 대해
-같은 규칙으로 수행한다.
-여기까지가 1 Cycle 이며 30 Cycle까지 해야한다.
-    :return:
-    '''
-    erase_range(0,2)
-    rcr_result = read_compare_range(0,2)
-    if rcr_result == "FAIL":
-        return rcr_result
-    write(2, hex_string_generator())
-    write(2, hex_string_generator())
-    erase_range(2,4)
-    rcr_result = read_compare_range(2, 4)
-    if rcr_result == "FAIL":
-        return rcr_result
-    write(4, hex_string_generator())
-    write(4, hex_string_generator())
-    erase_range(4, 6)
-    rcr_result = read_compare_range(4, 6)
-    if rcr_result == "FAIL":
-        return rcr_result
-    return rcr_result
+def erase_and_writing_aging_cycle(start, end):
+    write(start, hex_string_generator())
+    write(start, hex_string_generator())
+    erase_range(start ,end)
+    return read_compare_range(start, end)
 
+def erase_and_writing_aging():
+
+    erase_range(0,2)
+    result = read_compare_range(0,2)
+    # print(f'Cycle#0 : {result}')
+    if result == "FAIL":
+        return "FAIL"
+
+    cycle_cnt = 0
+    for i in range(2, 100, 2):
+        cycle_cnt+=1
+        if cycle_cnt > 30: break
+        result = erase_and_writing_aging_cycle(i, i+2)
+        # print(f'Cycle#{cycle_cnt} : {result}')
+        if result == "FAIL":
+            return "FAIL"
+    return "PASS"
 
 def shell():
     """무한 루프 쉘 모드"""
