@@ -3,8 +3,6 @@ from test_ssd_constants import *
 from test_ssd_utils import *
 
 class TestSsdEraseWithMock:
-
-
     @pytest.mark.parametrize( ("addr", "size"), [
         (FIRST_ADDRESS, "1"),
         (LAST_ADDRESS, "1"),
@@ -31,6 +29,25 @@ class TestSsdEraseWithMock:
         assert ssd.result == ERROR_MESSAGE
 
 
+class TestSsdEraseWithFake:
+    def test_erase_1(self, fake_ssd_and_device):
+        ssd, device = fake_ssd_and_device
+        ssd.run([WRITE_COMMAND, FIRST_ADDRESS, "0x1234abcd"])
+        ssd.run([ERASE_COMMAND, FIRST_ADDRESS, "1"])
+        ssd.run([READ_COMMAND, FIRST_ADDRESS])
+        assert ssd.result == DEFAULT_DATA
+
+    def test_erase_10(self, fake_ssd_and_device):
+        ssd, device = fake_ssd_and_device
+        size = 10
+        data_list = [ f"0x0000000{x}" for x in range(size)]
+        write_incr(ssd, FIRST_ADDRESS, data_list)
+        for wdata, rdata in zip(data_list, read_incr(ssd, FIRST_ADDRESS, size)):
+            assert wdata == rdata
+        erase_data(ssd, FIRST_ADDRESS, size)
+        for rdata in read_incr(ssd, FIRST_ADDRESS, size):
+            assert rdata == DEFAULT_DATA
+
 
 class TestSsdErase:
     def test_erase_1(self, ssd):
@@ -38,7 +55,7 @@ class TestSsdErase:
         wdata = "0x1234abcd"
         check_write_and_read(ssd, addr, wdata)
         erase_data(ssd, FIRST_ADDRESS, "1")
-        assert read_data(ssd, FIRST_ADDRESS) == DEFAULT_DATA
+        assert read_nand_data(ssd, FIRST_ADDRESS) == DEFAULT_DATA
 
     def test_erase_10(self, ssd):
         for i in range(10):
@@ -48,4 +65,4 @@ class TestSsdErase:
         erase_data(ssd, FIRST_ADDRESS, "10")
         for i in range(10):
             addr = f"{i}"
-            assert read_data(ssd, addr) == DEFAULT_DATA
+            assert read_nand_data(ssd, addr) == DEFAULT_DATA
