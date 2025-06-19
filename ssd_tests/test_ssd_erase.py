@@ -11,7 +11,7 @@ class TestSsdEraseWithMock:
     def test_erase_1_call(self, ssd_and_device, addr, size):
         ssd, device = ssd_and_device
         ssd.run([ERASE_COMMAND, addr, size])
-        device.erase.assert_called_with(int(addr), int(1))
+        device.erase.assert_called_with(int(addr), int(size))
 
     def test_erase_when_size_is_0(self, ssd_and_device):
         ssd, device = ssd_and_device
