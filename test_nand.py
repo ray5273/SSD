@@ -46,3 +46,31 @@ def test_nand_write_at_bound(nand):
     wdata = "0x1234abcd"
     with pytest.raises(Exception):
         nand.write(addr, wdata)
+
+
+def test_erase_success(nand):
+    addr = FIRST_ADDRESS+1
+    size = 5
+    for i in range(5):
+        nand.write(addr+i,"0x11111111")
+    nand.erase(addr,size)
+    for i in range(5):
+        assert nand.read(addr+i) == "0x00000000"
+
+
+def test_erase_success_bound(nand):
+    addr = LAST_ADDRESS-4
+    size = 5
+    for i in range(5):
+        nand.write(addr+i,"0x11111111")
+    nand.erase(addr,size)
+    for i in range(5):
+        assert nand.read(addr+i) == "0x00000000"
+
+def test_erase_fail_upper_bound(nand):
+    addr = LAST_ADDRESS-4
+    size = 6
+    for i in range(5):
+        nand.write(addr+i,"0x11111111")
+    with pytest.raises(Exception):
+        nand.erase(addr,size)
