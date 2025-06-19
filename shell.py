@@ -85,41 +85,39 @@ def erase(lba:int, size:int):
     유효한 LBA 범위는 0~99로 제한됩니다.
     """
 
-    try:
-        direction = 1 if size > 0 else -1
-        remaining = abs(size)
-        current_lba = lba
-        step = 10
 
-        while remaining > 0:
-            chunk_size = min(step, remaining)
+    direction = 1 if size > 0 else -1
+    remaining = abs(size)
+    current_lba = lba
+    step = 10
 
-            if direction > 0:
-                actual_lba = current_lba
-                upper_bound = actual_lba + chunk_size - 1
-                if upper_bound >= MAX_LBA:
-                    chunk_size = max(0, MAX_LBA - actual_lba)
-            else:
-                actual_lba = current_lba - chunk_size + 1
-                if actual_lba < MIN_LBA:
-                    chunk_size = max(0, current_lba - MIN_LBA + 1)
-                    actual_lba = MIN_LBA
+    while remaining > 0:
+        chunk_size = min(step, remaining)
 
-            if chunk_size <= 0:
-                break
+        if direction > 0:
+            actual_lba = current_lba
+            upper_bound = actual_lba + chunk_size - 1
+            if upper_bound >= MAX_LBA:
+                chunk_size = max(0, MAX_LBA - actual_lba)
+        else:
+            actual_lba = current_lba - chunk_size + 1
+            if actual_lba < MIN_LBA:
+                chunk_size = max(0, current_lba - MIN_LBA + 1)
+                actual_lba = MIN_LBA
 
-            status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
+        if chunk_size <= 0:
+            break
 
-            if status >= 0:
-                # Todo debugging
-                print(f"[ERASE] E {actual_lba:02} {chunk_size}")
-                current_lba += chunk_size * direction
-                remaining -= chunk_size
-            else:
-                print("Erase 에러 발생")
-        # fullread()
-    except:
-        print("erase 에러 발생")
+        status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
+
+        if status >= 0:
+            # Todo debugging
+            print(f"[ERASE] E {actual_lba:02} {chunk_size}")
+            current_lba += chunk_size * direction
+            remaining -= chunk_size
+        else:
+            print("Erase 에러 발생")
+
 
 
 def erase_range(lba_start: int, lba_end: int):
@@ -129,39 +127,35 @@ def erase_range(lba_start: int, lba_end: int):
     유효한 LBA 범위는 0 ~ 99 입니다.
     Start LBA > End LBA인 경우 자동으로 보정합니다.
     """
+    # start > end 이면 교환
+    if lba_start > lba_end:
+        lba_start, lba_end = lba_end, lba_start
 
-    try:
-        # start > end 이면 교환
-        if lba_start > lba_end:
-            lba_start, lba_end = lba_end, lba_start
+    # LBA 범위 보정
+    if lba_start < MIN_LBA:
+        lba_start = MIN_LBA
+    if lba_end >= MAX_LBA:
+        lba_end = MAX_LBA - 1
 
-        # LBA 범위 보정
-        if lba_start < MIN_LBA:
-            lba_start = MIN_LBA
-        if lba_end >= MAX_LBA:
-            lba_end = MAX_LBA - 1
+    current_lba = lba_start
+    total_size = lba_end - lba_start + 1
+    remaining = total_size
+    step = 10
 
-        current_lba = lba_start
-        total_size = lba_end - lba_start + 1
-        remaining = total_size
-        step = 10
+    while remaining > 0:
+        chunk_size = min(step, remaining)
 
-        while remaining > 0:
-            chunk_size = min(step, remaining)
+        status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
 
-            status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
+        if status >= 0:
+            # Todo debugging
+            print(f"[ERASE] E {current_lba:02} {chunk_size}")
+            current_lba += chunk_size
+            remaining -= chunk_size
+        else:
+            print("Erase 에러 발생")
+            return
 
-            if status >= 0:
-                # Todo debugging
-                print(f"[ERASE] E {current_lba:02} {chunk_size}")
-                current_lba += chunk_size
-                remaining -= chunk_size
-            else:
-                print("Erase 에러 발생")
-                return
-
-    except:
-        print("erase_range 에러 발생")
 
 
 def read_compare(lba, data, filename='ssd_output.txt'):
@@ -306,7 +300,7 @@ def shell():
                 lba_str, size_str =  user_input_list[param1_index], user_input_list[param2_index]
                 erase(lba=int(lba_str), size=int(size_str))
             elif command_param == "erase_range":
-                if not is_valid_erase_range_params(user_input_list=user_input_list):
+                if not is_valid_erase_command_params(user_input_list=user_input_list):
                     print("erase range command parameter가 맞지 않습니다.")
                     continue
                 lba_start_str, lba_end_str =  user_input_list[param1_index], user_input_list[param2_index]
