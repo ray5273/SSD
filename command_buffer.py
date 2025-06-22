@@ -5,7 +5,7 @@ from buffer_driver import BufferDriver
 DEFAULT_VALUE = "0x00000000"
 
 
-class CommandBuffer():
+class CommandBuffer:
     def __init__(self, device: Nand):
         self._device = device
         self._driver = BufferDriver()
@@ -63,6 +63,7 @@ class CommandBuffer():
             if index in delete_index_set:
                 continue
             result_buffers.append(buffer)
+        return result_buffers
 
     def ignore_erase(self, buffers):
         size = len(buffers)
@@ -89,8 +90,8 @@ class CommandBuffer():
                     is_write[lba_right - start_address] = True
 
             is_ignore_erase_possible = True
-            for i in range(count_or_data):
-                if is_write[i] is False:
+            for k in range(count_or_data):
+                if is_write[k] is False:
                     is_ignore_erase_possible = False
                     break
 
@@ -108,7 +109,7 @@ class CommandBuffer():
         pass
 
     def optimize(self, buffers):
-        pass
+        return buffers
 
     def read(self, address) -> str:
         buffers = self._driver.get_list_from_buffer_files()
@@ -125,7 +126,7 @@ class CommandBuffer():
             self.flush()
             buffers = []
         buffers.append(('W', address, wdata))
-        self.optimize(buffers)
+        buffers = self.optimize(buffers)
         self._driver.make_buffer_files_from_list(buffers)
 
     def erase(self, start_address, size):
@@ -136,7 +137,7 @@ class CommandBuffer():
             self.flush()
             buffers = []
         buffers.append(('E', start_address, size))
-        self.optimize(buffers)
+        buffers = self.optimize(buffers)
         self._driver.make_buffer_files_from_list(buffers)
 
     def flush(self):
