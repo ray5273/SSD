@@ -105,10 +105,54 @@ class CommandBuffer:
             result_buffers.append(buffer)
         return result_buffers
 
-    def merge_erase(self):
-        pass
+    def merge_erase(self, buffers):
+        size = len(buffers)
+        is_erase_or_write = [None] * (self._device.lba_length + 1)
+        write_data = [None] * (self._device.lba_length + 1)
+        for i in range(0, size):
+            commands = buffers[i]
+            command = commands[0]
+            lba = commands[1]
+            count_or_data = commands[2]
+            if command == 'W':
+                is_erase_or_write[lba] = command
+                write_data[lba] = count_or_data
+            else:
+                for k in range(0, count_or_data):
+                    is_erase_or_write[lba + k] = command
+
+        write_buffers = []
+        erase_buffers = []
+        index = 0
+        while index < self._device.lba_length:
+            if is_erase_or_write[index] == None:
+                index += 1
+                continue
+            if is_erase_or_write[index] == 'W':
+                write_buffers.append(('W', index, write_data[index]))
+                index += 1
+                continue
+            continuous_end_index = index
+            continuous_erase_end_index = index
+            while is_erase_or_write[continuous_end_index] != None:
+                if is_erase_or_write[continuous_end_index] == 'E':
+                    continuous_erase_end_index = continuous_end_index
+                else:
+                    write_buffers.append(('W', continuous_end_index, write_data[continuous_end_index]))
+                continuous_end_index += 1
+            erase_buffers.append(('E', index, continuous_erase_end_index - index + 1))
+            index = continuous_end_index
+            index += 1
+
+        result_buffers = erase_buffers + write_buffers
+        return result_buffers
 
     def optimize(self, buffers):
+        ignore_write_buffers = self.ignore_write(buffers)
+        ignore_erase_buffers = self.ignore_erase(ignore_write_buffers)
+        merge_erase_buffers = self.merge_erase(ignore_erase_buffers)
+        if len(buffers) > len(merge_erase_buffers):
+            return merge_erase_buffers
         return buffers
 
     def read(self, address) -> str:
