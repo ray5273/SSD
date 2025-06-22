@@ -1,5 +1,5 @@
-from command import Command
-from command_interface import SSDCommandInterface
+from .command import Command
+from .command_interface import SSDCommandInterface
 
 
 class UnknownSSDCommand(SSDCommandInterface):
