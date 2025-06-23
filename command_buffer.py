@@ -216,7 +216,6 @@ class CommandBuffer:
             return
         if self.is_buffers_full():
             self.flush()
-            self._buffers = []
         self._buffers.append(('E', start_address, size))
         self.optimize()
         self._driver.make_buffer_files_from_list(self._buffers)
@@ -230,3 +229,4 @@ class CommandBuffer:
 
         self._driver.delete_buffer_files()
         self._driver.create_empty_files()
+        self._buffers = []
