@@ -62,5 +62,7 @@ def test_flush(command_buffer):
     assert command_buffer.read(9) == '0x00001234'
 
 
-
-
+def test_fast_read(command_buffer):
+    command_buffer.write(3,'0x11111111')
+    command_buffer.erase(3,1)
+    assert command_buffer.read(3) == '0x00000000'

@@ -53,20 +53,30 @@ def test_merge_erase2(command_buffer):
     new_buffers = command_buffer.merge_erase(buffers)
     assert new_buffers == [('E', 0, 7), ('W', 2, '0x11111111'), ('W', 3, '0x11111111'), ('W', 7, '0x11111111')]
 
+def test_merge_erase3(command_buffer):
+    buffers = [ ('E', 0, 2), ('E', 5, 3), ('E', 3, 3)]
+    new_buffers = command_buffer.merge_erase(buffers)
+    assert new_buffers == [('E', 0, 2), ('E', 3, 5)]
 
 def test_total_optimize(command_buffer):
-    buffers = [('W', 0, '0x11111111'), ('E', 1, 3), ('W', 4, '0x11111111'), ('E', 4, 7), ('W', 3, '0x11111111')]
-    new_buffers = command_buffer.optimize(buffers)
-    assert new_buffers == [('E', 1, 10), ('W', 0, '0x11111111'), ('W', 3, '0x11111111')]
+    command_buffer.buffers = [('W', 0, '0x11111111'), ('E', 1, 3), ('W', 4, '0x11111111'), ('E', 4, 7), ('W', 3, '0x11111111')]
+    command_buffer.optimize()
+    assert  command_buffer.buffers == [('E', 1, 10), ('W', 0, '0x11111111'), ('W', 3, '0x11111111')]
 
 
 def test_total_optimize2(command_buffer):
-    buffers = [('W', 0, '0x11111111'), ('E', 0, 3), ('W', 4, '0x11111111'), ('E', 6, 3), ('W', 3, '0x11111111'),
+    command_buffer.buffers = [('W', 0, '0x11111111'), ('E', 0, 3), ('W', 4, '0x11111111'), ('E', 6, 3), ('W', 3, '0x11111111'),
                ('W', 5, '0x11111111'), ('W', 1, '0x11111111'), ('W', 2, '0x11111111')]
-    new_buffers = command_buffer.optimize(buffers)
-    assert new_buffers == [('E', 0, 9),
+    command_buffer.optimize()
+    assert command_buffer.buffers == [('E', 0, 9),
                            ('W', 1, '0x11111111'),
                            ('W', 2, '0x11111111'),
                            ('W', 3, '0x11111111'),
                            ('W', 4, '0x11111111'),
                            ('W', 5, '0x11111111')]
+
+
+def test_total_optimize3(command_buffer):
+    command_buffer.buffers = [('W', 0, '0xA'), ('W', 0, '0xB')]
+    command_buffer.optimize()
+    assert command_buffer.buffers == [('W', 0, '0xB')]
