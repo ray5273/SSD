@@ -3,7 +3,7 @@
 LBA_LENGTH = 100
 NAND_FILE = "test_ssd_nand.txt"
 OUTPUT_FILE = "test_ssd_output.txt"
-BUFFER_DIR = 'test_command_buffer'
+BUFFER_DIR = 'buffer_folder'
 DEFAULT_DATA = "0x00000000"
 WRITE_COMMAND = "W"
 READ_COMMAND = "R"
