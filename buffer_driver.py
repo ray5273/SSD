@@ -20,7 +20,7 @@ class BufferDriver:
                     is_file_exist = True
                     break
             if is_file_exist is False:
-                self.make_buffer_file(f"{index}_" + EMPTY_BUFFER)
+                self.make_buffer_file(f"{index}_{EMPTY_BUFFER}")
 
     def make_buffer_file(self, file_name):
         with open(os.path.join(self.buffer_folder, file_name), "w", encoding="utf-8") as f:

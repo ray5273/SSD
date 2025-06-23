@@ -1,6 +1,7 @@
 import pytest
 from nand import Nand
 from buffer_driver import BufferDriver
+import copy
 
 DEFAULT_VALUE = "0x00000000"
 
@@ -9,28 +10,55 @@ class CommandBuffer:
     def __init__(self, device: Nand):
         self._device = device
         self._driver = BufferDriver()
+        self._buffers = self._driver.get_list_from_buffer_files()
+
+    def is_command_write(self, command: tuple):
+        return command[0] == 'W'
+
+    def is_command_erase(self, command: tuple):
+        return command[0] == 'E'
+
+    def get_op_from_command(self, command: tuple):
+        return command[0]
+
+    def get_lba_from_command(self, command: tuple):
+        return command[1]
+
+    def get_count_or_data(self, command: tuple):
+        return command[2]
+
+    @property
+    def buffers(self):
+        return self._buffers
+
+    @buffers.setter
+    def buffers(self, datas: list):
+        self._buffers = datas
+
+    def is_buffers_full(self):
+        return self._buffers == 5
 
     def is_contained_range(self, command: tuple, address):
         start_address = command[1]
         end_address = command[2]
-        if command[0] == 'W':
+        if self.is_command_write(command):
             end_address = start_address
-        return start_address <= address and address <= end_address
+        return start_address <= address <= end_address
 
-    def is_exist_in_buffer(self, buffers, address):
-        if len(buffers) == 0:
+    def is_exist_in_buffer(self, address):
+        if len(self._buffers) == 0:
             return False
 
-        for command in reversed(buffers):
+        for command in reversed(self._buffers):
             if self.is_contained_range(command, address):
                 return True
 
         return False
 
-    def get_data_in_buffer(self, buffers, address):
-        for command in reversed(buffers):
+    def get_data_in_buffer(self, address):
+        for command in reversed(self._buffers):
             if self.is_contained_range(command, address):
-                if command[0] == 'E':
+                if self.is_command_erase(command):
                     return DEFAULT_VALUE
                 else:
                     write_data = command[2]
@@ -41,21 +69,19 @@ class CommandBuffer:
         size = len(buffers)
         delete_index_set = set()
         for i in range(size - 1, 0, -1):
-            commands = buffers[i]
-            command = commands[0]
-            lba = commands[1]
-            count_or_data = commands[2]
-            if command == "W":
+            command = buffers[i]
+            lba = self.get_lba_from_command(command)
+            count_or_data = self.get_count_or_data(command)
+            if self.is_command_write(command):
                 continue
             start_address = lba
             end_address = lba + count_or_data - 1
             for j in range(i - 1, -1, -1):
-                commands = buffers[j]
-                command_left = commands[0]
-                lba_left = commands[1]
-                if command_left == "E":
+                command = buffers[j]
+                lba_left = self.get_lba_from_command(command)
+                if self.is_command_erase(command):
                     continue
-                if lba_left >= start_address and lba_left <= end_address:
+                if start_address <= lba_left <= end_address:
                     delete_index_set.add(j)
 
         result_buffers = []
@@ -69,11 +95,10 @@ class CommandBuffer:
         size = len(buffers)
         delete_index_set = set()
         for i in range(0, size - 1):
-            commands = buffers[i]
-            command = commands[0]
-            lba = commands[1]
-            count_or_data = commands[2]
-            if command == "W":
+            command = buffers[i]
+            lba = self.get_lba_from_command(command)
+            count_or_data = self.get_count_or_data(command)
+            if self.is_command_write(command):
                 continue
             start_address = lba
             end_address = lba + count_or_data - 1
@@ -81,12 +106,11 @@ class CommandBuffer:
             is_write = [False] * count_or_data
 
             for j in range(i + 1, size):
-                commands = buffers[j]
-                command_right = commands[0]
-                lba_right = commands[1]
-                if command_right == "E":
+                command = buffers[j]
+                lba_right = self.get_lba_from_command(command)
+                if self.is_command_erase(command):
                     continue
-                if lba_right >= start_address and lba_right <= end_address:
+                if start_address <= lba_right <= end_address:
                     is_write[lba_right - start_address] = True
 
             is_ignore_erase_possible = True
@@ -110,16 +134,16 @@ class CommandBuffer:
         is_erase_or_write = [None] * (self._device.lba_length + 1)
         write_data = [None] * (self._device.lba_length + 1)
         for i in range(0, size):
-            commands = buffers[i]
-            command = commands[0]
-            lba = commands[1]
-            count_or_data = commands[2]
-            if command == 'W':
-                is_erase_or_write[lba] = command
+            command = buffers[i]
+            op = self.get_op_from_command(command)
+            lba = self.get_lba_from_command(command)
+            count_or_data = self.get_count_or_data(command)
+            if self.is_command_write(command):
+                is_erase_or_write[lba] = op
                 write_data[lba] = count_or_data
             else:
                 for k in range(0, count_or_data):
-                    is_erase_or_write[lba + k] = command
+                    is_erase_or_write[lba + k] = op
 
         write_buffers = []
         erase_buffers = []
@@ -147,50 +171,46 @@ class CommandBuffer:
         result_buffers = erase_buffers + write_buffers
         return result_buffers
 
-    def optimize(self, buffers):
+    def optimize(self):
+        buffers = copy.deepcopy(self._buffers)
         ignore_write_buffers = self.ignore_write(buffers)
         ignore_erase_buffers = self.ignore_erase(ignore_write_buffers)
         merge_erase_buffers = self.merge_erase(ignore_erase_buffers)
         if len(buffers) > len(merge_erase_buffers):
-            return merge_erase_buffers
-        return buffers
+            self._buffers = merge_erase_buffers
 
     def read(self, address) -> str:
-        buffers = self._driver.get_list_from_buffer_files()
-        if self.is_exist_in_buffer(buffers, address):
-            return self.get_data_in_buffer(buffers, address)
+        if self.is_exist_in_buffer(address):
+            return self.get_data_in_buffer(address)
 
         return self._device.read(address)
 
     def write(self, address, wdata):
-        if wdata == "0x00000000":
+        if wdata == DEFAULT_VALUE:
             self.erase(address, 1)
-        buffers = self._driver.get_list_from_buffer_files()
-        if len(buffers) == 5:
+            return
+        if self.is_buffers_full():
             self.flush()
-            buffers = []
-        buffers.append(('W', address, wdata))
-        buffers = self.optimize(buffers)
-        self._driver.make_buffer_files_from_list(buffers)
+            self._buffers = []
+        self._buffers.append(('W', address, wdata))
+        self.optimize()
+        self._driver.make_buffer_files_from_list(self._buffers)
 
     def erase(self, start_address, size):
         if size <= 0:
             return
-        buffers = self._driver.get_list_from_buffer_files()
-        if len(buffers) == 5:
+        if self.is_buffers_full():
             self.flush()
-            buffers = []
-        buffers.append(('E', start_address, size))
-        buffers = self.optimize(buffers)
-        self._driver.make_buffer_files_from_list(buffers)
+            self._buffers = []
+        self._buffers.append(('E', start_address, size))
+        self.optimize()
+        self._driver.make_buffer_files_from_list(self._buffers)
 
     def flush(self):
-        buffers = self._driver.get_list_from_buffer_files()
-
-        for command in buffers:
-            if command[0] == 'W':
+        for command in self._buffers:
+            if self.is_command_write(command):
                 self._device.write(command[1], command[2])
-            elif command[0] == 'E':
+            elif self.is_command_erase(command):
                 self._device.erase(command[1], command[2])
 
         self._driver.delete_buffer_files()
