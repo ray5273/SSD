@@ -84,6 +84,7 @@ def test_total_optimize3(command_buffer):
 
 def test_buffer_length(command_buffer):
     wdata = "0x12345678"
+    command_buffer.flush()
     command_buffer.write( 5, wdata)
     command_buffer.write( 10, wdata)
     command_buffer.write( 15, wdata)
