@@ -36,7 +36,7 @@ class CommandBuffer:
         self._buffers = datas
 
     def is_buffers_full(self):
-        return self._buffers == 5
+        return len(self._buffers) == 5
 
     def is_contained_range(self, command: tuple, address):
         start_address = self.get_lba_from_command(command)

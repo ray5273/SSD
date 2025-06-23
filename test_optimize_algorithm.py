@@ -80,3 +80,14 @@ def test_total_optimize3(command_buffer):
     command_buffer.buffers = [('W', 0, '0xA'), ('W', 0, '0xB')]
     command_buffer.optimize()
     assert command_buffer.buffers == [('W', 0, '0xB')]
+
+
+def test_buffer_length(command_buffer):
+    wdata = "0x12345678"
+    command_buffer.write( 5, wdata)
+    command_buffer.write( 10, wdata)
+    command_buffer.write( 15, wdata)
+    command_buffer.write( 20, wdata)
+    command_buffer.write( 25, wdata)
+    command_buffer.write( 35, wdata)
+    assert len(command_buffer.buffers) == 1
