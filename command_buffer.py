@@ -4,6 +4,7 @@ from buffer_driver import BufferDriver
 import copy
 
 DEFAULT_VALUE = "0x00000000"
+ERASE_MAX_SIZE = 10
 
 
 class CommandBuffer:
@@ -130,6 +131,18 @@ class CommandBuffer:
             result_buffers.append(buffer)
         return result_buffers
 
+    def divide_erase_range_by_ten(self, erase_buffers):
+        result = []
+        for erase_command in erase_buffers:
+            start_address = self.get_lba_from_command(erase_command)
+            erase_size = self.get_count_or_data(erase_command)
+            while erase_size > ERASE_MAX_SIZE:
+                result.append(('E', start_address, ERASE_MAX_SIZE))
+                erase_size -= ERASE_MAX_SIZE
+                start_address += ERASE_MAX_SIZE
+            result.append(('E', start_address, erase_size))
+        return result
+
     def merge_erase(self, buffers):
         size = len(buffers)
         is_erase_or_write = [None] * (self._device.lba_length + 1)
@@ -169,7 +182,8 @@ class CommandBuffer:
             index = continuous_end_index
             index += 1
 
-        result_buffers = erase_buffers + write_buffers
+        divided_erase_buffers = self.divide_erase_range_by_ten(erase_buffers)
+        result_buffers = divided_erase_buffers + write_buffers
         return result_buffers
 
     def optimize(self):
