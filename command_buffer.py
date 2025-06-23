@@ -18,15 +18,15 @@ class CommandBuffer:
 
     @property
     def buffers(self):
-        return self.bufferables_to_list(self._buffers)
+        return self.bufferables_to_tuples(self._buffers)
         # return self._buffers
 
     @buffers.setter
     def buffers(self, datas: List[tuple]):
-        self._buffers = self.list_to_bufferables(datas)
+        self._buffers = self.tuples_to_bufferables(datas)
         # self._buffers = datas
 
-    def list_to_bufferables(self, param_list: List[tuple]) -> List[Union[WriteBuffer, EraseBuffer]]:
+    def tuples_to_bufferables(self, param_list: List[tuple]) -> List[Union[WriteBuffer, EraseBuffer]]:
         buffers = []
         for params in param_list:
             if params[0] == 'W':
@@ -35,7 +35,7 @@ class CommandBuffer:
                 buffers.append(EraseBuffer(*params))
         return buffers
 
-    def bufferables_to_list(self, buffers: List[Bufferable]) -> List[tuple]:
+    def bufferables_to_tuples(self, buffers: List[Bufferable]) -> List[tuple]:
         return [x.to_tuple() for x in buffers ]
 
     def is_buffers_full(self):
@@ -56,7 +56,7 @@ class CommandBuffer:
 
     def ignore_write(self, buffers: List[tuple]):
         size = len(buffers)
-        buffers = self.list_to_bufferables(buffers)
+        buffers = self.tuples_to_bufferables(buffers)
         for i in range(size - 1, 0, -1):
             right_buffer = buffers[i]
             # if right_buffer.is_write():
@@ -69,11 +69,11 @@ class CommandBuffer:
                     left_write_buffer.need_to_ignore = True
 
         result_buffers = [ x for x in buffers if x.need_to_ignore == False]
-        return self.bufferables_to_list(result_buffers)
+        return self.bufferables_to_tuples(result_buffers)
 
     def ignore_erase(self, buffers: List[tuple]):
         size = len(buffers)
-        buffers = self.list_to_bufferables(buffers)
+        buffers = self.tuples_to_bufferables(buffers)
         for i in range(0, size - 1):
             left_erase_buffer = buffers[i]
             if left_erase_buffer.is_write():
@@ -89,7 +89,7 @@ class CommandBuffer:
                 left_erase_buffer.need_to_ignore = True
 
         result_buffers = [ x for x in buffers if x.need_to_ignore == False]
-        return self.bufferables_to_list(result_buffers)
+        return self.bufferables_to_tuples(result_buffers)
 
     def divide_erase_range_by_max_size(self, erase_buffers: List[EraseBuffer]) -> List[EraseBuffer]:
         result = []
@@ -128,10 +128,10 @@ class CommandBuffer:
 
         divided_erase_buffers = self.divide_erase_range_by_max_size(erase_buffers)
         result_buffers = divided_erase_buffers + write_buffers
-        return self.bufferables_to_list(result_buffers)
+        return self.bufferables_to_tuples(result_buffers)
 
     def create_buffer_table(self, buffers: List[tuple]) -> List[Union[WriteBuffer, EraseBuffer, None]]:
-        buffers = self.list_to_bufferables(buffers)
+        buffers = self.tuples_to_bufferables(buffers)
         buffer_table = [None] * (self._device.lba_length + 1)
         for buffer in buffers:
             if buffer.is_write():
