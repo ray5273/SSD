@@ -12,7 +12,7 @@ class Bufferable(ABC):
 
     @classmethod
     def is_erase(cls):
-        return True
+        return False
 
     @abstractmethod
     def contains_address(self, addr):
