@@ -91,3 +91,13 @@ def test_buffer_length(command_buffer):
     command_buffer.write( 25, wdata)
     command_buffer.write( 35, wdata)
     assert len(command_buffer.buffers) == 1
+
+def test_divide_by_ten(command_buffer):
+    command_buffer.buffers = [('E', 10, 6), ('E', 16, 5)]
+    command_buffer.optimize()
+    assert command_buffer.buffers == [('E', 10, 6), ('E', 16, 5)]
+
+def test_divide_by_ten_2(command_buffer):
+    command_buffer.buffers = [('E', 10, 8), ('E', 18, 8),('E',26,3),('W',26,'0x11111111'),('E',29,1)]
+    command_buffer.optimize()
+    assert command_buffer.buffers == [('E', 10, 10), ('E', 20, 10),('W',26,'0x11111111')]
