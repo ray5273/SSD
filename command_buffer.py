@@ -206,7 +206,6 @@ class CommandBuffer:
             return
         if self.is_buffers_full():
             self.flush()
-            self._buffers = []
         self._buffers.append(('W', address, wdata))
         self.optimize()
         self._driver.make_buffer_files_from_list(self._buffers)
