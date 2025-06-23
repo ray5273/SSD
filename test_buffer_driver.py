@@ -19,14 +19,14 @@ def test_get_list_from_buffer_command_files(buffer_driver):
     command = ('W','0','0x00000000')
     list = [command]
     buffer_driver.make_buffer_files_from_list(list)
-    assert buffer_driver.get_list_from_buffer_files() == [command]
+    assert buffer_driver.get_list_from_buffer_files() == [('W',0,'0x00000000')]
 
 def test_get_list_from_buffer_command_files2(buffer_driver):
     command1 = ('W','0','0x00000001')
     command2 = ('W','0','0x00000002')
     list = [command1, command2]
     buffer_driver.make_buffer_files_from_list(list)
-    assert buffer_driver.get_list_from_buffer_files() == list
+    assert buffer_driver.get_list_from_buffer_files() == [('W',0,'0x00000001'),('W',0,'0x00000002')]
 
 
 def test_make_list_to_buffer_file_fail(buffer_driver):
