@@ -10,6 +10,7 @@ import shell
 from shell_commands.command import IShellCommand
 from shell_commands.erase import ShellEraseCommand
 from shell_commands.erase_range import ShellEraseRangeCommand
+from shell_commands.flush import ShellFlushCommand
 from shell_commands.fullread import ShellFullReadCommand
 from shell_commands.fullwrite import ShellFullWriteCommand
 from shell_commands.read import ShellReadCommand, read_compare
@@ -257,11 +258,13 @@ def test_class_shell_read_command_mock_with_valid_lba(mocker):
 
 
 def test_flush_with_mock(mocker):
-    global mock_ssd
-    mock_ssd = {}
-
-    mocker.patch('shell.call_system', return_value=0)
-    assert shell.flush() == True
+    mock_logger = mocker.patch('shell_commands.command.LOGGER.print_log')
+    with patch('builtins.print') as mock_print:
+        ShellFlushCommand().execute()
+        expected_calls = [
+            mocker.call('[FLUSH]'),
+        ]
+        mock_logger.assert_has_calls(expected_calls)
 
 
 

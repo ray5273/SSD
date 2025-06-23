@@ -8,6 +8,7 @@ from shell_command_validator import is_valid_command, is_valid_read_command_para
     is_valid_fullwrite_command_params,TEST_SCRIPT_1,TEST_SCRIPT_2,TEST_SCRIPT_3, TEST_SCRIPT_4, hex_string_generator
 from shell_commands.erase import ShellEraseCommand
 from shell_commands.erase_range import ShellEraseRangeCommand
+from shell_commands.flush import ShellFlushCommand
 from shell_commands.fullread import ShellFullReadCommand
 from shell_commands.fullwrite import ShellFullWriteCommand
 from shell_commands.read import ShellReadCommand, read_compare
@@ -17,17 +18,7 @@ from shell_commands.script3 import ShellScript3Command
 from shell_commands.script4 import ShellScript4Command
 from shell_commands.write import ShellWriteCommand
 
-SUBPROCESS_VALID_STATUS = 0
 
-def is_valid_status(status):
-    return status == SUBPROCESS_VALID_STATUS
-
-def flush():
-    status = call_system(f'python ssd.py F')
-    if is_valid_status(status):
-        LOGGER.print_log(f'[FLUSH]')
-        return True
-    return False
 
 def help():
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -78,7 +69,7 @@ def shell():
             elif command_param == "fullread":
                 ShellFullReadCommand().execute()
             elif command_param == "flush":
-                flush()
+                ShellFlushCommand().execute()
             elif command_param == "erase":
                 if not is_valid_erase_command_params(user_input_list=user_input_list):
                     LOGGER.print_log("erase command parameter가 포맷에 맞지 않습니다.")
