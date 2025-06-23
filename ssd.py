@@ -2,6 +2,7 @@ import sys
 
 from commands.command import Command
 from commands.erase_command import EraseSSDCommand
+from commands.flush_command import FlushSSDCommand
 from commands.read_command import ReadSSDCommand
 from commands.unknown_command import UnknownSSDCommand
 from commands.write_command import WriteSSDCommand
@@ -22,7 +23,9 @@ class SSD:
         self.commands = {
             Command.READ: ReadSSDCommand(self._device, self._out_writer),
             Command.WRITE: WriteSSDCommand(self._device, self._out_writer),
-            Command.ERASE: EraseSSDCommand(self._device, self._out_writer)}
+            Command.ERASE: EraseSSDCommand(self._device, self._out_writer),
+            Command.FLUSH: FlushSSDCommand(self._device, self._out_writer)
+        }
 
     def run(self, params: list) -> bool:
         if not params:
