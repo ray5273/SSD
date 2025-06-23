@@ -169,4 +169,15 @@ class TestCommandBufferWithMock:
         cb.erase(75, 5)
         assert len(cb.buffers) == 3
 
-
+    def test_many_erase(self, cb_with_fake):
+        cb, driver, device = cb_with_fake
+        cb.flush()
+        for addr in range(50, 85):
+            cb.erase(addr, 1)
+        assert len(cb.buffers) == 4
+        assert cb.buffers == [
+            ('E', 50, 10),
+            ('E', 60, 10),
+            ('E', 70, 10),
+            ('E', 80, 5),
+        ]
