@@ -1,15 +1,23 @@
 import sys
 
+from command_buffer import CommandBuffer
 from commands.command import Command
+from commands.command_interface import SSDCommandInterface
 from commands.erase_command import EraseSSDCommand
 from commands.flush_command import FlushSSDCommand
 from commands.read_command import ReadSSDCommand
 from commands.unknown_command import UnknownSSDCommand
 from commands.write_command import WriteSSDCommand
-
 from file_output import FileOutput
 from nand import Nand
-from command_buffer import CommandBuffer
+
+COMMAND_CLASSES: dict[Command, type[SSDCommandInterface]] = {
+    Command.READ: ReadSSDCommand,
+    Command.WRITE: WriteSSDCommand,
+    Command.ERASE: EraseSSDCommand,
+    Command.FLUSH: FlushSSDCommand,
+}
+
 
 class SSD:
     LBA_LENGTH = 100
@@ -20,11 +28,8 @@ class SSD:
         self._device = device
         self._out_writer = FileOutput(self.OUTPUT_FILE)
         self.result = ""
-        self.commands = {
-            Command.READ: ReadSSDCommand(self._device, self._out_writer),
-            Command.WRITE: WriteSSDCommand(self._device, self._out_writer),
-            Command.ERASE: EraseSSDCommand(self._device, self._out_writer),
-            Command.FLUSH: FlushSSDCommand(self._device, self._out_writer)
+        self.commands: dict[Command, SSDCommandInterface] = {
+            cmd: cls(self._device, self._out_writer) for cmd, cls in COMMAND_CLASSES.items()
         }
 
     def run(self, params: list) -> bool:
@@ -45,6 +50,7 @@ class SSD:
     def write_error(self):
         self.result = self.ERROR_MSG
         self._out_writer.write(self.result)
+
 
 FILE_PATH = "ssd_nand.txt"
 LBA_LENGTH = 100
