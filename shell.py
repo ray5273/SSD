@@ -16,7 +16,7 @@ def write(lba, data, output='ssd_output.txt'):
     """write"""
     cmd = f'python ssd.py W {lba} {data}'
     status = call_system(cmd)
-    if status >= 0:
+    if status == 0:
         # 잘 써졌는지 결과 확인, SSD에서 write 에러 발생 시에 파일에 ERROR 출력.
         result = read(lba, output)
         if result == "ERROR":
@@ -44,10 +44,17 @@ def read_result_file(filename):
     return line
 
 
+def flush():
+    status = call_system(f'python ssd.py F')
+    if status == 0:
+        LOGGER.print_log(f'[FLUSH]')
+        return True
+    return False
+
 def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
     read_data = None
-    if status >= 0:
+    if status == 0:
         read_data = read_result_file(filename)
         lba=int(lba)
         LOGGER.print_log(f'[READ] LBA {lba:02d} : {read_data}')
@@ -112,7 +119,7 @@ def erase(lba:int, size:int):
 
         status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
 
-        if status >= 0:
+        if status == 0:
             # Todo debugging
             LOGGER.print_log(f"[ERASE] E {actual_lba:02} {chunk_size}")
             current_lba += chunk_size * direction
@@ -150,7 +157,7 @@ def erase_range(lba_start: int, lba_end: int):
 
         status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
 
-        if status >= 0:
+        if status == 0:
             # Todo debugging
             LOGGER.print_log(f"[ERASE] E {current_lba:02} {chunk_size}")
             current_lba += chunk_size
@@ -288,6 +295,8 @@ def shell():
                     continue
                 lba_str = user_input_list[param1_index]
                 read(lba=lba_str)
+            elif command_param == "flush":
+                flush()
             elif command_param == "fullwrite":
                 if not is_valid_fullwrite_command_params(user_input_list=user_input_list):
                     LOGGER.print_log("fullwrite command parameter가 포맷에 맞지 않습니다.")

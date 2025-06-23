@@ -253,6 +253,8 @@ def test_partial_lba_write_2_fail(mocker):
 
 
 mock_ssd = {}
+def mock_flush():
+    return True
 def mock_write(lba, data):
     mock_ssd[lba] = data
 def mock_read(lba):
@@ -282,5 +284,14 @@ def test_erase_and_writing_aging_cycle(mocker):
     mocker.patch('shell.erase_range', side_effect=mock_erase_range)
     assert shell.erase_and_writing_aging_cycle(0,2) == "PASS"
     assert shell.erase_and_writing_aging_cycle(5, 7) == "PASS"
+
+
+def test_flush_with_mock(mocker):
+    global mock_ssd
+    mock_ssd = {}
+
+    mocker.patch('shell.call_system', return_value=0)
+    assert shell.flush() == True
+
 
 
