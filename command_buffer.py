@@ -22,7 +22,7 @@ class CommandBuffer:
         # return self._buffers
 
     @buffers.setter
-    def buffers(self, datas: list):
+    def buffers(self, datas: List[tuple]):
         self._buffers = self.list_to_bufferables(datas)
         # self._buffers = datas
 
@@ -35,26 +35,26 @@ class CommandBuffer:
                 buffers.append(EraseBuffer(*params))
         return buffers
 
-    def bufferables_to_list(self, buffers) -> List[tuple]:
+    def bufferables_to_list(self, buffers: List[Bufferable]) -> List[tuple]:
         return [x.to_tuple() for x in buffers ]
 
     def is_buffers_full(self):
         return len(self._buffers) == 5
 
-    def get_data_in_buffer(self, address) -> Optional[str]:
+    def get_data_in_buffer(self, address: int) -> Optional[str]:
         for buffer in reversed(self._buffers):
             if buffer.contains_address(address):
                 return buffer.get_data(address)
         return None
 
-    def add_buffer(self, buffer):
+    def add_buffer(self, buffer: Bufferable):
         if self.is_buffers_full():
             self.flush()
         self._buffers.append(buffer)
         self.optimize()
         self._driver.make_buffer_files_from_list(self.buffers)
 
-    def ignore_write(self, buffers):
+    def ignore_write(self, buffers: List[tuple]):
         size = len(buffers)
         buffers = self.list_to_bufferables(buffers)
         for i in range(size - 1, 0, -1):
@@ -71,7 +71,7 @@ class CommandBuffer:
         result_buffers = [ x for x in buffers if x.need_to_ignore == False]
         return self.bufferables_to_list(result_buffers)
 
-    def ignore_erase(self, buffers):
+    def ignore_erase(self, buffers: List[tuple]):
         size = len(buffers)
         buffers = self.list_to_bufferables(buffers)
         for i in range(0, size - 1):
@@ -104,7 +104,7 @@ class CommandBuffer:
             result.append(EraseBuffer('E', start_address, erase_size))
         return result
 
-    def merge_erase(self, buffers):
+    def merge_erase(self, buffers: List[tuple]):
         buffer_table = self.create_buffer_table(buffers)
 
         write_buffers = []
@@ -130,7 +130,7 @@ class CommandBuffer:
         result_buffers = divided_erase_buffers + write_buffers
         return self.bufferables_to_list(result_buffers)
 
-    def create_buffer_table(self, buffers) -> List[Union[WriteBuffer, EraseBuffer, None]]:
+    def create_buffer_table(self, buffers: List[tuple]) -> List[Union[WriteBuffer, EraseBuffer, None]]:
         buffers = self.list_to_bufferables(buffers)
         buffer_table = [None] * (self._device.lba_length + 1)
         for buffer in buffers:
@@ -149,18 +149,18 @@ class CommandBuffer:
         if len(buffers) > len(merge_erase_buffers):
             self.buffers = merge_erase_buffers
 
-    def read(self, address) -> str:
+    def read(self, address: int) -> str:
         if data := self.get_data_in_buffer(address):
             return data
         return self._device.read(address)
 
-    def write(self, address, wdata):
+    def write(self, address: int, wdata: str):
         if wdata == DEFAULT_DATA:
             self.erase(address, 1)
             return
         self.add_buffer( WriteBuffer('W', address, wdata))
 
-    def erase(self, start_address, size):
+    def erase(self, start_address: int, size: int):
         if size <= 0:
             return
         self.add_buffer( EraseBuffer('E', start_address, size))
