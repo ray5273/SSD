@@ -1098,9 +1098,7 @@ extra_corner_cases = [
 
 ]
 
-# all_scenarios(addi)
 all_scenarios.extend(extra_corner_cases)
-# all_scenarios.extend(additional_scenarios)
 
 @pytest.mark.parametrize("scenario_id, input_cmds, expected_cmds", all_scenarios)
 def test_all_optimization_scenarios(scenario_id, input_cmds, expected_cmds, command_buffer_with_cleanup):
