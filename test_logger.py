@@ -39,6 +39,21 @@ def write_generate_1_file(logger:Logger, target_bytes: int):
         message = f"Test message {count} to fill up the log file"
         logger.print_log(message)
 
+def test_singleton_without_changing_value():
+    logger = Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES,test_mode=True)
+    another_logger = Logger(is_stdout=False, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES,test_mode=True)
+    assert logger is another_logger
+    assert logger.is_stdout == True
+
+def test_singleton_update_settings():
+    logger = Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES, test_mode=True)
+    another_logger = Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES, test_mode=True)
+    assert logger is another_logger
+    another_logger.update_settings(is_stdout=False, file_path=TEST_LATEST_FILE, max_bytes=100)
+
+    assert logger.is_stdout == False
+    assert logger.max_bytes == 100
+    assert logger.file_path == TEST_LATEST_FILE
 
 def test_print_log_success(stdout_logger):
     # stdout 출력 캡처

@@ -2,7 +2,15 @@ import datetime
 import inspect
 import os
 
+def singleton(cls):
+    instances = {}
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return wrapper
 
+@singleton
 class Logger:
     def __init__(self, is_stdout: bool, file_path: str, max_bytes: int, test_mode=False):
         self.is_stdout = is_stdout
