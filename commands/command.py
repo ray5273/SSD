@@ -5,3 +5,4 @@ class Command(StrEnum):
     WRITE = "W"
     ERASE = "E"
     UNKNOWN = "U"
+    FLUSH = "F"

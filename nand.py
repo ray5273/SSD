@@ -58,3 +58,6 @@ class Nand:
         with open(self.data_file, 'w', encoding='utf-8') as f:
             f.writelines(lines)
         return
+
+    def flush(self):
+        return
