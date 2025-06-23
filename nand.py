@@ -59,7 +59,7 @@ class Nand:
 
     def _write_lines(self, _lines: List[str]):
         with open(self.data_file, 'w', encoding='utf-8') as f:
-            f.writelines(lines)
+            f.writelines(_lines)
         return
 
     def flush(self):
