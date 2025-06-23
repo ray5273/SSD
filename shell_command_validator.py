@@ -101,7 +101,7 @@ def is_valid_erase_range_params(user_input_list: list) -> bool:
     return True
 
 def is_valid_command(command_param):
-    valid_command_list = ["write", "read", "erase", "erase_range", "fullwrite", "fullread", "help", "exit"]
+    valid_command_list = ["flush", "write", "read", "erase", "erase_range", "fullwrite", "fullread", "help", "exit"]
     if command_param != "" \
         and (TEST_SCRIPT_1.startswith(command_param) \
             or TEST_SCRIPT_2.startswith(command_param) \
