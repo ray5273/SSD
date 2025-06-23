@@ -39,10 +39,11 @@ class CommandBuffer:
         return self._buffers == 5
 
     def is_contained_range(self, command: tuple, address):
-        start_address = command[1]
-        end_address = command[2]
+        start_address = self.get_lba_from_command(command)
         if self.is_command_write(command):
             end_address = start_address
+        else:
+            end_address = start_address + self.get_count_or_data(command) - 1
         return start_address <= address <= end_address
 
     def is_exist_in_buffer(self, address):
