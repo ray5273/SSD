@@ -11,12 +11,17 @@ from shell_command_validator import is_valid_command, is_valid_read_command_para
 MAX_LBA = 100
 MIN_LBA = 0
 INITIAL_VALUE = '0x00000000'
-SUBPROCESS_STATUS = 0
+SUBPROCESS_VALID_STATUS = 0
+
+def is_valid_status(status):
+    return status == SUBPROCESS_VALID_STATUS
+
+
 def write(lba, data, output='ssd_output.txt'):
     """write"""
     cmd = f'python ssd.py W {lba} {data}'
     status = call_system(cmd)
-    if status == SUBPROCESS_STATUS:
+    if is_valid_status(status):
         # 잘 써졌는지 결과 확인, SSD에서 write 에러 발생 시에 파일에 ERROR 출력.
         result = read(lba, output)
         if result == "ERROR":
@@ -25,6 +30,7 @@ def write(lba, data, output='ssd_output.txt'):
             LOGGER.print_log(f'[WRITE] Done')
         return result
     return "INVALID COMMAND : WRITE"
+
 
 
 def call_system(cmd: str):
@@ -46,7 +52,7 @@ def read_result_file(filename):
 
 def flush():
     status = call_system(f'python ssd.py F')
-    if status == SUBPROCESS_STATUS:
+    if is_valid_status(status):
         LOGGER.print_log(f'[FLUSH]')
         return True
     return False
@@ -54,7 +60,7 @@ def flush():
 def read(lba, filename='ssd_output.txt'):
     status = call_system(f'python ssd.py R {lba}')
     read_data = None
-    if status == SUBPROCESS_STATUS:
+    if is_valid_status(status):
         read_data = read_result_file(filename)
         lba=int(lba)
         LOGGER.print_log(f'[READ] LBA {lba:02d} : {read_data}')
@@ -119,7 +125,7 @@ def erase(lba:int, size:int):
 
         status = call_system(f'python ssd.py E {actual_lba} {chunk_size}')
 
-        if status == SUBPROCESS_STATUS:
+        if is_valid_status(status):
             # Todo debugging
             LOGGER.print_log(f"[ERASE] E {actual_lba:02} {chunk_size}")
             current_lba += chunk_size * direction
@@ -157,7 +163,7 @@ def erase_range(lba_start: int, lba_end: int):
 
         status = call_system(f'python ssd.py E {current_lba} {chunk_size}')
 
-        if status == SUBPROCESS_STATUS:
+        if is_valid_status(status):
             # Todo debugging
             LOGGER.print_log(f"[ERASE] E {current_lba:02} {chunk_size}")
             current_lba += chunk_size
