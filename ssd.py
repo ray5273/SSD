@@ -8,7 +8,7 @@ from commands.write_command import WriteSSDCommand
 
 from file_output import FileOutput
 from nand import Nand
-
+from command_buffer import CommandBuffer
 
 class SSD:
     LBA_LENGTH = 100
@@ -48,6 +48,7 @@ LBA_LENGTH = 100
 
 if __name__ == "__main__":
     nand = Nand(LBA_LENGTH, FILE_PATH)
-    ssd = SSD(nand)
+    command_buffer = CommandBuffer(nand)
+    ssd = SSD(command_buffer)
 
     ssd.run(sys.argv[1:])
