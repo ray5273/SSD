@@ -9,6 +9,10 @@ class IShellCommand(ABC):
     MIN_LBA = 0
     # SSD 테스트에 쓰이는 constants
     INITIAL_VALUE = '0x00000000'
+    SUBPROCESS_VALID_STATUS = 0
+
+    def is_valid_status(self, status):
+        return status == self.SUBPROCESS_VALID_STATUS
 
     def __init__(self, params=[], output=None):
         self.command = 'CMD'
