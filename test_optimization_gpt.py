@@ -52,10 +52,9 @@ def run_full_optimization(command_buffer, commands):
     """
     # 사용자의 optimize 함수는 최적화가 일어나지 않으면 원본을 반환하므로,
     # 테스트 시에는 항상 최적화 함수들을 순서대로 직접 호출하여 결과를 비교합니다.
-    after_ignore_write = command_buffer.ignore_write(commands)
-    after_ignore_erase = command_buffer.ignore_erase(after_ignore_write)
-    final_result = command_buffer.merge_erase(after_ignore_erase)
-    return final_result
+    command_buffer.buffers = commands
+    command_buffer.optimize()
+    return command_buffer.buffers
 
 
 # ======================================================================================
