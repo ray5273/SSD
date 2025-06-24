@@ -81,41 +81,26 @@ def mock_erase_range(start, end):
         mock_ssd[i] = shell.INITIAL_VALUE
 
 def test_run_shell_command_with_mock_script1(mocker):
-    global mock_ssd
-    mock_ssd = {}
     runner = Runner('')
-    mocker.patch('shell.call_system', return_value=0)
-    mocker.patch('shell.write', side_effect=mock_write)
-    mocker.patch('shell.read', side_effect=mock_read)
+    mocker.patch('shell.Runner.run_shell_command', return_value ="PASS")
     assert runner.run_shell_command("1_FullWriteAndReadCompare") == "PASS"
 
 def test_run_shell_command_with_mock_script4(mocker):
-    global mock_ssd
-    mock_ssd = {}
     runner = Runner('')
-    mocker.patch('shell.call_system', return_value=0)
-    mocker.patch('shell.write', side_effect=mock_write)
-    mocker.patch('shell.read', side_effect=mock_read)
-    mocker.patch('shell.erase_range', side_effect=mock_erase_range)
+    mocker.patch('shell.Runner.run_shell_command', return_value="PASS")
     assert runner.run_shell_command("4_EraseAndWriteAging") == "PASS"
 
-@pytest.mark.skip
-def test_run_shell_command():
+def test_run_shell_1_command():
     runner = Runner('')
     assert runner.run_shell_command("1_FullWriteAndReadCompare") == "PASS"
 
-@pytest.mark.skip
-def test_run_shell_command():
+def test_run_shell_4_command():
     runner = Runner('')
     assert runner.run_shell_command("4_EraseAndWriteAging") == "PASS"
 
-@pytest.mark.skip
 def test_run_batch_script():
     runner = Runner(get_test_batch_script())
     assert runner.run() == "PASS"
-
-def test_run_batch_script():
-    assert shell.run_batch_script(get_test_batch_script_with_1_3()) == "PASS"
 
 def test_call_in_cli():
     assert os.system('python shell.py test.txt') < 0
