@@ -1,4 +1,3 @@
-from pygments.lexers import data
 
 from shell_command_validator import hex_string_generator
 from shell_commands.command import IShellCommand
