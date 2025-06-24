@@ -27,10 +27,9 @@ class EraseSSDCommand(SSDCommandInterface):
         if not self.is_valid_param(params):
             self.result = self.ERROR_MSG
         else:
+            self.result = ""
             address, size = int(params[1]), int(params[2])
-            if size == 0:
-                self.result = ""
-            else:
-                self.result = self._device.erase(address, size)
+            if size > 0:
+                self._device.erase(address, size)
 
         return self.result
