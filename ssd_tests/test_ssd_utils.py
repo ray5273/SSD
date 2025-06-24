@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from nand import Nand
+from ssd_modules.device.nand import Nand
 from ssd import SSD
 from test_ssd_constants import *
 

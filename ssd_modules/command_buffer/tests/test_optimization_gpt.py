@@ -1,7 +1,6 @@
 import pytest
-from nand import Nand
-from buffer_driver import BufferDriver
-from command_buffer import CommandBuffer
+from ssd_modules.device.nand import Nand
+from ssd_modules.command_buffer.command_buffer import CommandBuffer
 import os
 
 # 테스트에 사용될 기본 설정 값

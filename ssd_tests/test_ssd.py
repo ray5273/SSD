@@ -1,12 +1,5 @@
 import os.path
-from unittest.mock import DEFAULT
 
-import pytest
-
-from ssd import SSD
-from nand import Nand
-
-from test_ssd_constants import *
 from test_ssd_utils import *
 
 
