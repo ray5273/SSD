@@ -54,22 +54,20 @@ class CommandBuffer:
         self.optimize()
         self._driver.make_buffer_files_from_list(self.buffers)
 
-    def ignore_write(self, buffers: List[tuple]):
-        size = len(buffers)
-        buffers = self.tuples_to_bufferables(buffers)
+    def ignore_write(self):
+        size = len(self._buffers)
         for i in range(size - 1, 0, -1):
-            right_buffer = buffers[i]
+            right_buffer = self._buffers[i]
             # if right_buffer.is_write():
             #     continue
             for j in range(i - 1, -1, -1):
-                left_write_buffer = buffers[j]
+                left_write_buffer = self._buffers[j]
                 if left_write_buffer.is_erase():
                     continue
                 if right_buffer.contains_address( left_write_buffer.addr ):
                     left_write_buffer.need_to_ignore = True
 
-        result_buffers = [ x for x in buffers if x.need_to_ignore == False]
-        return self.bufferables_to_tuples(result_buffers)
+        self._buffers = [ x for x in self._buffers if x.need_to_ignore == False]
 
     def ignore_erase(self, buffers: List[tuple]):
         size = len(buffers)
@@ -142,11 +140,11 @@ class CommandBuffer:
         return buffer_table
 
     def optimize(self):
-        buffers = copy.deepcopy(self.buffers)
-        ignore_write_buffers = self.ignore_write(buffers)
-        ignore_erase_buffers = self.ignore_erase(ignore_write_buffers)
+        # buffers = copy.deepcopy(self.buffers)
+        self.ignore_write()
+        ignore_erase_buffers = self.ignore_erase(self.buffers)
         merge_erase_buffers = self.merge_erase(ignore_erase_buffers)
-        if len(buffers) > len(merge_erase_buffers):
+        if len(self._buffers) > len(merge_erase_buffers):
             self.buffers = merge_erase_buffers
 
     def read(self, address: int) -> str:

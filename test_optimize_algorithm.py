@@ -18,14 +18,16 @@ def command_buffer():
 
 def test_ignore_write(command_buffer):
     buffers = [('E', 0, 3), ('W', 0, '0x12345678'), ('W', 1, '0x11111111'), ('E', 0, 5)]
-    new_buffers = command_buffer.ignore_write(buffers)
-    assert new_buffers == [('E', 0, 3), ('E', 0, 5)]
+    command_buffer.buffers = buffers
+    command_buffer.ignore_write()
+    assert command_buffer.buffers == [('E', 0, 3), ('E', 0, 5)]
 
 
 def test_ignore_write2(command_buffer):
     buffers = [('W', 0, '0x12345678'), ('E', 0, 1), ('W', 1, '0x11111111'), ('E', 0, 5), ('W', 1, '0x11111111')]
-    new_buffers = command_buffer.ignore_write(buffers)
-    assert new_buffers == [('E', 0, 1), ('E', 0, 5), ('W', 1, '0x11111111')]
+    command_buffer.buffers = buffers
+    command_buffer.ignore_write()
+    assert command_buffer.buffers == [('E', 0, 1), ('E', 0, 5), ('W', 1, '0x11111111')]
 
 
 def test_ignore_erase(command_buffer):
