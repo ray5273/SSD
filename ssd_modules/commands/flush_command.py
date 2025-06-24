@@ -1,4 +1,3 @@
-from command_buffer import CommandBuffer
 from .command import Command
 from .command_interface import SSDCommandInterface
 

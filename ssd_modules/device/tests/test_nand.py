@@ -1,8 +1,8 @@
 import pytest
 
-from nand import Nand
+from ssd_modules.device.nand import Nand
 
-FILE_PATH = "test_ssd_nand.txt"
+FILE_PATH = "../../../test_ssd_nand.txt"
 LBA_LENGTH = 100
 DEFAULT_VALUE = "0x00000000"
 FIRST_ADDRESS = 0

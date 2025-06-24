@@ -1,5 +1,5 @@
 import os.path
-from output_interface import OutputInterface
+from ssd_modules.file_output.output_interface import OutputInterface
 
 
 class FileOutput(OutputInterface):

@@ -1,9 +1,6 @@
-import pytest
 from pytest_mock import MockerFixture
 
-from command_buffer import CommandBuffer
-from ssd import SSD
-from test_ssd_constants import *
+from ssd_modules.command_buffer.command_buffer import CommandBuffer
 from test_ssd_utils import *
 import shutil
 

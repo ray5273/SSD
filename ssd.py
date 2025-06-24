@@ -1,15 +1,15 @@
 import sys
 
-from command_buffer import CommandBuffer
-from commands.command import Command
-from commands.command_interface import SSDCommandInterface
-from commands.erase_command import EraseSSDCommand
-from commands.flush_command import FlushSSDCommand
-from commands.read_command import ReadSSDCommand
-from commands.unknown_command import UnknownSSDCommand
-from commands.write_command import WriteSSDCommand
-from file_output import FileOutput
-from nand import Nand
+from ssd_modules.command_buffer.command_buffer import CommandBuffer
+from ssd_modules.commands.command import Command
+from ssd_modules.commands.command_interface import SSDCommandInterface
+from ssd_modules.commands.erase_command import EraseSSDCommand
+from ssd_modules.commands.flush_command import FlushSSDCommand
+from ssd_modules.commands.read_command import ReadSSDCommand
+from ssd_modules.commands.unknown_command import UnknownSSDCommand
+from ssd_modules.commands.write_command import WriteSSDCommand
+from ssd_modules.file_output.file_output import FileOutput
+from ssd_modules.device.nand import Nand
 
 COMMAND_CLASSES: dict[Command, type[SSDCommandInterface]] = {
     Command.READ: ReadSSDCommand,

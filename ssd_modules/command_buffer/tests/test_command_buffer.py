@@ -1,10 +1,10 @@
 import pytest
 
-from buffer_driver import BufferDriver
-from command_buffer import CommandBuffer
-from nand import Nand
+from ssd_modules.command_buffer.buffer_driver import BufferDriver
+from ssd_modules.command_buffer.command_buffer import CommandBuffer
+from ssd_modules.device.nand import Nand
 
-FILE_PATH = "test_ssd_nand.txt"
+FILE_PATH = "../../../command_buffer_tests/test_ssd_nand.txt"
 LBA_LENGTH = 100
 DEFAULT_VALUE = "0x00000000"
 FIRST_ADDRESS = 0

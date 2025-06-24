@@ -1,10 +1,9 @@
 from typing import List, Union, Optional
 
 from constants import DEFAULT_DATA
-from bufferables import Bufferable, WriteBuffer, EraseBuffer
-from nand import Nand
-from buffer_driver import BufferDriver
-import copy
+from ssd_modules.command_buffer.bufferables import Bufferable, WriteBuffer, EraseBuffer
+from ssd_modules.device.nand import Nand
+from ssd_modules.command_buffer.buffer_driver import BufferDriver
 
 DEFAULT_VALUE = "0x00000000"
 ERASE_MAX_SIZE = 10
