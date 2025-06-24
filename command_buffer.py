@@ -57,8 +57,6 @@ class CommandBuffer:
     def ignore_write(self):
         for i in range(len(self._buffers) - 1, 0, -1):
             right_buffer = self._buffers[i]
-            # if right_buffer.is_write():
-            #     continue
             for j in range(i - 1, -1, -1):
                 left_write_buffer = self._buffers[j]
                 if left_write_buffer.is_erase():
