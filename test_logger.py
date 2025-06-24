@@ -23,11 +23,15 @@ def cleanup():
 
 @pytest.fixture()
 def stdout_logger():
-    return Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES,test_mode=True)
+    logger = Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES,test_mode=True)
+    logger.update_settings(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES, test_mode=True)
+    return logger
 
 @pytest.fixture()
 def file_only_logger():
-    return Logger(is_stdout=False, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES,test_mode=True)
+    logger = Logger(is_stdout=True, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES, test_mode=True)
+    logger.update_settings(is_stdout=False, file_path=TEST_LATEST_FILE, max_bytes=TEST_MAX_BYTES, test_mode=True)
+    return logger
 
 def write_generate_1_file(logger:Logger, target_bytes: int):
     """지정된 바이트 수 이상으로 로그 파일을 채웁니다"""

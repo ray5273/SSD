@@ -18,10 +18,11 @@ class Logger:
         self.max_bytes = max_bytes
         self.test_mode = test_mode
 
-    def update_settings(self, is_stdout: bool, file_path: str, max_bytes: int):
+    def update_settings(self, is_stdout: bool, file_path: str, max_bytes: int, test_mode=False):
         self.is_stdout = is_stdout
         self.file_path = file_path
         self.max_bytes = max_bytes
+        self.test_mode = test_mode
 
     # runner의 출력은 stdout에만 찍히면 되므로 이 메세지를 통해서 출력을함.
     def print_always(self, message: str, end="\n", flush=True):
